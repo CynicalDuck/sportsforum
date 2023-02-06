@@ -13,22 +13,22 @@ const Sidebar = () => (
     whileInView="show"
     viewport={{ once: false, amount: 0.25 }}
   >
-    <div className="text-white">//Search</div>
-    <div className="text-white">//Last posts</div>
-    <div className="text-white">Nyttige lenker</div>
-    {links.map((link, index) => (
-      <div className="text-white">
-        <motion.a
-          variants={fadeIn("up", "tween", 0.2, 1)}
-          className="font-semibold text-white hover:text-secondary-white"
-          href={link.url}
-          target={link.target}
-        >
-          {link.name}
-        </motion.a>
-        <br />
+    <div className="bg-white px-4 py-4 mb-1 rounded-[24px]">
+      <div className="text-black font-semibold">Current user</div>
+    </div>
+    <div className="bg-white px-4 py-4 mb-1 rounded-[24px]">
+      <div className="text-black font-semibold">Last posts</div>
+    </div>
+    <div className="bg-white px-4 py-4 mb-1 rounded-[24px]">
+      <div className="text-black font-semibold">Nyttige lenker</div>
+      <div className="flex flex-col gap-1">
+        {links.map((link, index) => (
+          <a href={link.href} key={index} className="text-black">
+            {link.name}
+          </a>
+        ))}
       </div>
-    ))}
+    </div>
   </motion.div>
 );
 
