@@ -15,7 +15,7 @@ const Navbar = () => (
     <div
       className={`${styles.innerWidth} mx-auto flex justify-between gap-8 text-white font-semibold lg:text-[60px] md:text-[40px] sm:text-[24px] text-[24px]`}
     >
-      [VPN LOGO]
+      KLANSFORUMET
     </div>
   </motion.nav>
 );
