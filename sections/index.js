@@ -1,6 +1,6 @@
 import Hero from "./Hero";
-import Blog from "./Blog";
+import FrontPage from "./FrontPage";
 import Skills from "./Skills";
 import Projects from "./Projects";
 
-export { Hero, Blog, Skills, Projects };
+export { Hero, FrontPage, Skills, Projects };
