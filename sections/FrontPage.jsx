@@ -132,17 +132,28 @@ const FrontPage = (props) => {
 
   return (
     <section className={`relative`}>
-      <div className="mx-auto px-10">
-        <div className="grid grid-cols-6 gap-4">
-          <Sidebar
-            createNewUser={createNewUser}
-            setCreateNewUser={setCreateNewUser}
-            forgotPassword={forgotPassword}
-            setForgotPassword={setForgotPassword}
-            currentUserSession={props.currentUserSession}
-          />
+      <div className="container mx-auto px-10">
+        <div className="grid lg:grid-cols-6 gap-4 sm:grid-cols-1 md:grid-cols-1">
+          <div className="hidden lg:block col-span-1">
+            <Sidebar
+              createNewUser={createNewUser}
+              setCreateNewUser={setCreateNewUser}
+              forgotPassword={forgotPassword}
+              setForgotPassword={setForgotPassword}
+              currentUserSession={props.currentUserSession}
+            />
+          </div>
           <div className="col-span-5 bg-white rounded-[24px] py-4 px-4">
             <Forum currentUserSession={props.currentUserSession} />
+          </div>
+          <div className="hidden lg:hidden md:block sm:block col-span-1">
+            <Sidebar
+              createNewUser={createNewUser}
+              setCreateNewUser={setCreateNewUser}
+              forgotPassword={forgotPassword}
+              setForgotPassword={setForgotPassword}
+              currentUserSession={props.currentUserSession}
+            />
           </div>
         </div>
       </div>
