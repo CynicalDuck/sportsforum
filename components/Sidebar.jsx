@@ -1,46 +1,88 @@
 "use client";
+import { useState } from "react";
 import { supabase } from "../lib/supabaseClient";
-import { motion } from "framer-motion";
 
 import { links } from "../constants";
-import { staggerContainer } from "../utils/motion";
 
-const Sidebar = () => {
-  const user = supabase.auth.getUser();
+const Sidebar = (props) => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
-  console.log(user);
+  async function login() {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: username,
+      password: password,
+    });
 
-  function signUp() {}
+    if (data?.user?.aud === "authenticated") {
+      window.location.reload();
+    }
+  }
+
+  async function logout() {
+    const { error } = await supabase.auth.signOut();
+    if (!error) {
+      window.location.reload();
+    }
+  }
 
   return (
-    <motion.div
-      variants={staggerContainer}
-      initial="show"
-      whileInView="show"
-      viewport={{ once: false, amount: 0.25 }}
-    >
+    <div>
       <div className="bg-white px-4 py-4 mb-1 rounded-[24px]">
-        <div className="text-black font-semibold">Current user</div>
-        <div className="flex flex-col gap-1">
-          <label
-            for="first_name"
-            class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-          >
-            First name
-          </label>
-          <input
-            type="text"
-            id="first_name"
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            placeholder="John"
-            required
-          ></input>
-          Password
-          <input
-            className="border border-gray-300 rounded-[24px] px-4 py-2"
-            type="password"
-          />
-        </div>
+        <div className="text-black font-semibold">Innlogget bruker</div>
+        {props.currentUserSession?.user?.aud === "authenticated" ? (
+          <div className="flex flex-col gap-1">
+            <div className="text-black">
+              {props.currentUserSession.user.user_metadata.full_name}
+            </div>
+            <button
+              className="bg-blue-500 text-white rounded-[24px] px-4 py-2 mt-1"
+              onClick={() => logout()}
+            >
+              Logg ut
+            </button>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-1">
+            Brukernavn
+            <input
+              type="text"
+              id="first_name"
+              className="border border-gray-300 rounded-[24px] px-4 py-2"
+              placeholder="Brukernavn"
+              required
+              onChange={(e) => setUsername(e.target.value)}
+            ></input>
+            Passord
+            <input
+              className="border border-gray-300 rounded-[24px] px-4 py-2"
+              type="password"
+              placeholder="Passord"
+              required
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button
+              className="bg-blue-500 text-white rounded-[24px] px-4 py-2 mt-1"
+              onClick={() => login()}
+            >
+              Logg inn
+            </button>
+            <div className="flex flex-row gap-2">
+              <div
+                className="text-[12px] hover:text-blue-500 hover:cursor-pointer"
+                onClick={() => props.setCreateNewUser(true)}
+              >
+                Registrer deg
+              </div>
+              <div
+                className="text-[12px] hover:text-blue-500 hover:cursor-pointer"
+                onClick={() => props.setForgotPassword(true)}
+              >
+                Glemt passord
+              </div>
+            </div>
+          </div>
+        )}
       </div>
       <div className="bg-white px-4 py-4 mb-1 rounded-[24px]">
         <div className="text-black font-semibold">Last posts</div>
@@ -49,13 +91,17 @@ const Sidebar = () => {
         <div className="text-black font-semibold">Nyttige lenker</div>
         <div className="flex flex-col gap-1">
           {links.map((link, index) => (
-            <a href={link.href} key={index} className="text-black">
+            <a
+              href={link.url}
+              key={index}
+              className="text-black hover:text-blue-500"
+            >
               {link.name}
             </a>
           ))}
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 

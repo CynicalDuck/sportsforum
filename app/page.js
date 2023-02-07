@@ -1,16 +1,30 @@
+"use client";
+
+import { supabase } from "../lib/supabaseClient";
+import { useEffect, useState } from "react";
+
 import { Footer, Navbar, Sidebar } from "../components";
 import { FrontPage, Hero } from "../sections";
 
-const Page = () => (
-  <div className="bg-gradient-to-tl from-gray-600 via-gray-700 to-gray-900 overflow-hidden">
-    <Navbar />
-    <FrontPage />
-    <div className="gradient-03 z-0" />
-    <div className="relative">
-      <div className="gradient-04 z-0" />
+const Page = () => {
+  const [currentUserSession, setCurrentUserSession] = useState(null);
+
+  useEffect(() => {
+    checkLoginState();
+  }, []);
+
+  async function checkLoginState() {
+    const { data, error } = await supabase.auth.getSession();
+    setCurrentUserSession(data.session);
+  }
+
+  return (
+    <div className="bg-gradient-to-tl from-gray-600 via-gray-700 to-gray-900 overflow-hidden">
+      <Navbar />
+      <FrontPage currentUserSession={currentUserSession} />
+      <Footer />
     </div>
-    <Footer />
-  </div>
-);
+  );
+};
 
 export default Page;
