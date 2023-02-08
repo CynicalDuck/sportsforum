@@ -36,7 +36,7 @@ const Sidebar = (props) => {
               {props.currentUserSession.user.user_metadata.full_name}
             </div>
             <button
-              className="bg-blue-500 text-white rounded-[24px] px-4 py-2 mt-1"
+              className="bg-primary-blue text-white rounded-[24px] px-4 py-2 mt-1"
               onClick={() => logout()}
             >
               Logg ut
@@ -62,20 +62,20 @@ const Sidebar = (props) => {
               onChange={(e) => setPassword(e.target.value)}
             />
             <button
-              className="bg-blue-500 text-white rounded-[24px] px-4 py-2 mt-1"
+              className="bg-primary-blue text-white rounded-[24px] px-4 py-2 mt-1"
               onClick={() => login()}
             >
               Logg inn
             </button>
             <div className="flex flex-row gap-2">
               <div
-                className="text-[12px] hover:text-blue-500 hover:cursor-pointer"
+                className="text-[12px] hover:text-primary-blue hover:cursor-pointer"
                 onClick={() => props.setCreateNewUser(true)}
               >
                 Registrer deg
               </div>
               <div
-                className="text-[12px] hover:text-blue-500 hover:cursor-pointer"
+                className="text-[12px] hover:text-primary-blue hover:cursor-pointer"
                 onClick={() => props.setForgotPassword(true)}
               >
                 Glemt passord
@@ -94,7 +94,7 @@ const Sidebar = (props) => {
             <a
               href={link.url}
               key={index}
-              className="text-black hover:text-blue-500"
+              className="text-black hover:text-primary-blue"
             >
               {link.name}
             </a>
