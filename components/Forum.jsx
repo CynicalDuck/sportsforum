@@ -1,14 +1,15 @@
 "use client";
 
 // Import dependencies
+import dynamic from "next/dynamic";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import Moment from "react-moment";
 import "moment-timezone";
-import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 
 // Import components
 import Sidebar from "../components/Sidebar";
@@ -352,16 +353,16 @@ const Forum = (props) => {
     return (
       <section className={`relative`}>
         <div className="flex flex-col">
-          <div className="text-black font-semibold">
+          <div className="text-black font-semibold mb-2">
             Opprett ny post i {selectedFolder.name}
           </div>
-          <label className="text-gray-500 mt-2">Trådnavn</label>
-          <ReactQuill
-            theme="snow"
-            value={createNewPostContent}
-            onChange={setCreateNewPostContent}
-            className="h-[300px] mb-10"
-          />
+          <div>
+            <ReactQuill
+              value={createNewPostContent}
+              onChange={setCreateNewPostContent}
+              className="h-[300px] mb-10"
+            />
+          </div>
           <label className="text-gray-400 text-[12px]">
             Dette feltet er obligatorisk og må være på mer enn 3 tegn
           </label>
