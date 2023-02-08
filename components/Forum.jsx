@@ -360,7 +360,7 @@ const Forum = (props) => {
             theme="snow"
             value={createNewPostContent}
             onChange={setCreateNewPostContent}
-            className="h-[400px]"
+            className="h-[300px] mb-10"
           />
           <label className="text-gray-400 text-[12px]">
             Dette feltet er obligatorisk og må være på mer enn 3 tegn
