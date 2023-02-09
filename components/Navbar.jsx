@@ -1,23 +1,15 @@
 "use client";
 
-import { motion } from "framer-motion";
-
 import styles from "../styles";
 import { navVariants } from "../utils/motion";
 
 const Navbar = () => (
-  <motion.nav
-    variants={navVariants}
-    initial="hidden"
-    whileInView="show"
-    className={`${styles.xPaddings} py-8 relative`}
-  >
-    <div
-      className={`${styles.innerWidth} mx-auto flex justify-between gap-8 text-white font-semibold lg:text-[60px] md:text-[40px] sm:text-[24px] text-[24px]`}
-    >
-      KLANSFORUMET
+  <nav className={`py-2 relative bg-white flex flex-col rounded-[1px]`}>
+    <div className={"text-gray-500 text-[18px] pl-10"}>KLANSFORUMET</div>
+    <div className={"text-gray-500 text-[12px] pl-10"}>
+      Vålerengas uavhengige supporteres klubb
     </div>
-  </motion.nav>
+  </nav>
 );
 
 export default Navbar;
