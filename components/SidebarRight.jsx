@@ -27,24 +27,17 @@ const SidebarRight = (props) => {
       password: password,
     });
 
-    if (data?.user?.aud === "authenticated") {
-      if (typeof window !== "undefined") {
-        setCurrentUserSessionState(
-          localStorage.setItem("klansforum_user_auth", true)
-        );
-      }
+    if (error) {
+      console.log(error.message);
+    }
 
+    if (data?.user?.aud === "authenticated") {
       window.location.reload();
     }
   }
 
   async function logout() {
     const { error } = await supabase.auth.signOut();
-    if (typeof window !== "undefined") {
-      setCurrentUserSessionState(
-        localStorage.removeItem("klansforum_user_auth")
-      );
-    }
 
     if (!error) {
       window.location.href = "/";
@@ -53,7 +46,7 @@ const SidebarRight = (props) => {
 
   return (
     <div className="bg-gray-200 px-4 py-4 text-[12px] border-l-[1px] border-gray-300 min-h-screen h-[100%]">
-      {props.currentUserSessionState === "true" ? (
+      {props.currentUserSessionState === true ? (
         <div className="flex flex-col gap-2">
           <div className="text-gray-600 text-[14px]">
             {props.currentUserSession?.user?.user_metadata?.full_name}

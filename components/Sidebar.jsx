@@ -92,7 +92,7 @@ const Sidebar = (props) => {
 
   return (
     <div className="bg-gray-200 px-4 py-4 text-[12px] border-r-[1px] border-gray-300 min-h-screen h-[100%]">
-      {props.currentUserSessionState === "true" ? (
+      {props.currentUserSessionState === true ? (
         <div className="flex flex-col gap-3">
           <div className="group flex flex-row gap-1">
             <div className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-indigo-500">

@@ -15,9 +15,13 @@ const Page = () => {
     checkLoginState();
   }, []);
 
-  if (typeof window !== "undefined") {
-    setCurrentUserSessionState(localStorage.getItem("klansforum_user_auth"));
+  if (
+    currentUserSession?.user?.aud === "authenticated" &&
+    (currentUserSessionState === null || currentUserSessionState === false)
+  ) {
+    setCurrentUserSessionState(true);
   }
+  console.log(currentUserSessionState);
 
   async function checkLoginState() {
     const { data, error } = await supabase.auth.getSession();
@@ -52,16 +56,6 @@ const Page = () => {
 
   if (currentUserSession) {
     checkForUserProfile();
-  }
-
-  if (currentUserSession?.user?.aud === "authenticated") {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("klansforum_user_auth", true);
-    }
-  } else {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("klansforum_user_auth");
-    }
   }
 
   if (currentUserProfile && currentUserSession && currentUserSessionState) {
