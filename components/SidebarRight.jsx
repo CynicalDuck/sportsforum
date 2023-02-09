@@ -28,14 +28,24 @@ const SidebarRight = (props) => {
     });
 
     if (data?.user?.aud === "authenticated") {
-      localStorage.setItem("klansforum_user_auth", true);
+      if (typeof window !== "undefined") {
+        setCurrentUserSessionState(
+          localStorage.setItem("klansforum_user_auth", true)
+        );
+      }
+
       window.location.reload();
     }
   }
 
   async function logout() {
     const { error } = await supabase.auth.signOut();
-    localStorage.removeItem("klansforum_user_auth");
+    if (typeof window !== "undefined") {
+      setCurrentUserSessionState(
+        localStorage.removeItem("klansforum_user_auth")
+      );
+    }
+
     if (!error) {
       window.location.href = "/";
     }
