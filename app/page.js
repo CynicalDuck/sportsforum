@@ -83,7 +83,7 @@ const Page = () => {
       }
 
       if (userProfileError) {
-        handleError(userProfileError.message);
+        //handleError(userProfileError.message);
       }
     } else if (currentUserProfile === null) {
       setCurrentUserProfile(data[0]);
