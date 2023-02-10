@@ -26,12 +26,6 @@ const Footer = () => (
             </a>
             . All rights reserved.
           </p>
-
-          <div className="hidden lg:block">
-            <a href="https://www.buymeacoffee.com/mariusbekkG">
-              <img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=mariusbekkG&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff" />
-            </a>
-          </div>
           <div className="flex gap-4">
             {socials.map((social) => (
               <a href={social.url} key={social.name} target="_blank">
