@@ -1072,50 +1072,52 @@ const Forum = (props) => {
         <div className="container mx-auto px-4 text-gray-400 bg-white py-2 px-2 rounded-[14px]">
           Administrator panelet
           <div className="flex flex-col gap-2 mt-3">
-            <table>
-              <thead>
-                <tr>
-                  <th>Brukernavn</th>
-                  <th>Moderator</th>
-                  <th>Administrator</th>
-                </tr>
-              </thead>
-              <tbody>
-                {allUserProfiles
-                  ? allUserProfiles.map((profile) => (
-                      <tr>
-                        <td>{profile.user_name}</td>
-                        <td>
-                          <input
-                            className="object-center"
-                            type="checkbox"
-                            disabled={profile.is_super}
-                            id={profile.user_id}
-                            name={"checkbox_is_mod_" + profile.user_id}
-                            defaultChecked={profile.is_mod}
-                            onChange={(e) => {
-                              changeUserIsMod(e.target.checked, profile);
-                            }}
-                          />
-                        </td>
-                        <td>
-                          <input
-                            className="object-center"
-                            type="checkbox"
-                            disabled={profile.is_super}
-                            id={profile.user_id}
-                            name={"checkbox_is_admin_" + profile.user_id}
-                            defaultChecked={profile.is_admin}
-                            onChange={(e) => {
-                              changeUserIsAdmin(e.target.checked, profile);
-                            }}
-                          />
-                        </td>
-                      </tr>
-                    ))
-                  : null}
-              </tbody>
-            </table>
+            <div className="table-wrapper">
+              <table className="fl-table">
+                <thead>
+                  <tr>
+                    <th>Brukernavn</th>
+                    <th>Moderator</th>
+                    <th>Administrator</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {allUserProfiles
+                    ? allUserProfiles.map((profile) => (
+                        <tr>
+                          <td>{profile.user_name}</td>
+                          <td>
+                            <input
+                              className="object-center"
+                              type="checkbox"
+                              disabled={profile.is_super}
+                              id={profile.user_id}
+                              name={"checkbox_is_mod_" + profile.user_id}
+                              defaultChecked={profile.is_mod}
+                              onChange={(e) => {
+                                changeUserIsMod(e.target.checked, profile);
+                              }}
+                            />
+                          </td>
+                          <td>
+                            <input
+                              className="object-center"
+                              type="checkbox"
+                              disabled={profile.is_super}
+                              id={profile.user_id}
+                              name={"checkbox_is_admin_" + profile.user_id}
+                              defaultChecked={profile.is_admin}
+                              onChange={(e) => {
+                                changeUserIsAdmin(e.target.checked, profile);
+                              }}
+                            />
+                          </td>
+                        </tr>
+                      ))
+                    : null}
+                </tbody>
+              </table>
+            </div>
             <div className="flex flex-row gap-2 mt-6">
               <button
                 type="button"

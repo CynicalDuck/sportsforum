@@ -65,6 +65,27 @@ const FrontPage = (props) => {
               showMessage={props.showMessage}
               message={props.message}
             />
+            <div className="block sm:block md:block lg:hidden col-span-1">
+              <SidebarRight
+                createNewUser={createNewUser}
+                setCreateNewUser={setCreateNewUser}
+                forgotPassword={forgotPassword}
+                setForgotPassword={setForgotPassword}
+                currentUserSession={props.currentUserSession}
+                currentUserSessionState={props.currentUserSessionState}
+                currentUserProfile={props.currentUserProfile}
+                showSettings={showSettings}
+                setShowSettings={setShowSettings}
+                showAdmin={showAdmin}
+                setShowAdmin={setShowAdmin}
+                handleError={props.handleError}
+                showError={props.showError}
+                errorMessage={props.errorMessage}
+                handleSuccess={props.handleSuccess}
+                showMessage={props.showMessage}
+                message={props.message}
+              />
+            </div>
           </div>
           <div className="hidden lg:block col-span-1">
             <SidebarRight

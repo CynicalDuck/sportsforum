@@ -56,7 +56,7 @@ const SidebarRight = (props) => {
             {props.currentUserSession?.user?.user_metadata?.full_name}
           </div>
           <img
-            className="contain-avatar rounded-[24px] max-h-[180px] min-w-[160px] max-w-[170px] shadow-sm shadow-black"
+            className="contain-avatar rounded-[24px] max-h-[180px] min-w-[160px] max-w-[170px] shadow-sm shadow-black hidden md:hidden lg:block"
             src={props.currentUserProfile?.avatar_url}
           />
           <div className="bg-white rounded-[15px] h-[100%] w-[100%] min-w-[180px] mt-2 py-2 px-2 flex flex-col gap-2">
