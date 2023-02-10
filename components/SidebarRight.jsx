@@ -48,6 +48,10 @@ const SidebarRight = (props) => {
     }
   }
 
+  if (props.createNewUser || props.forgotPassword) {
+    return null;
+  }
+
   return (
     <div className="bg-gray-200 px-4 py-4 text-[12px] border-gray-300 min-h-screen h-[100%] lg:border-l-[1px]">
       {props.currentUserSessionState === true ? (
