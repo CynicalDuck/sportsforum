@@ -49,7 +49,7 @@ const SidebarRight = (props) => {
   }
 
   return (
-    <div className="bg-gray-200 px-4 py-4 text-[12px] border-l-[1px] border-gray-300 min-h-screen h-[100%]">
+    <div className="bg-gray-200 px-4 py-4 text-[12px] border-gray-300 min-h-screen h-[100%] lg:border-l-[1px]">
       {props.currentUserSessionState === true ? (
         <div className="flex flex-col gap-2">
           <div className="text-gray-600 text-[14px] hidden lg:block">
@@ -163,31 +163,31 @@ const SidebarRight = (props) => {
           </div>
         </div>
       ) : (
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1 sm:flex-row md:flex-col lg:flex-col">
           <form action="javascript:void(0);">
             <input
               type="text"
               id="first_name"
-              className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-indigo-500 mb-1"
+              className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-indigo-500 mb-1 w-[100%]"
               placeholder="Brukernavn"
               required
               onChange={(e) => setUsername(e.target.value)}
             ></input>
             <input
-              className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-indigo-500"
+              className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-indigo-500 w-[100%]"
               type="password"
               placeholder="Passord"
               required
               onChange={(e) => setPassword(e.target.value)}
             />
             <button
-              className="bg-indigo-500 text-white rounded-[24px] px-4 py-2 mt-1 min-w-[160px]"
+              className="bg-indigo-500 text-white rounded-[24px] px-4 py-2 mt-1 min-w-[160px] w-[100%]"
               onClick={() => login()}
             >
               Logg inn
             </button>
           </form>
-          <div className="flex flex-row gap-2">
+          <div className="flex flex-row gap-2 w-[100%]">
             <div
               className="text-[10px] hover:text-indigo-500 hover:cursor-pointer"
               onClick={() => props.setCreateNewUser(true)}
