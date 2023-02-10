@@ -56,9 +56,6 @@ const SidebarRight = (props) => {
     <div className="bg-gray-200 px-4 py-4 text-[12px] border-gray-300 min-h-screen h-[100%] lg:border-l-[1px]">
       {props.currentUserSessionState === true ? (
         <div className="flex flex-col gap-2">
-          <div className="text-gray-600 text-[14px] hidden lg:block">
-            {props.currentUserSession?.user?.user_metadata?.full_name}
-          </div>
           <img
             className="contain-avatar rounded-[24px] max-h-[180px] min-w-[160px] max-w-[170px] shadow-sm shadow-black hidden md:hidden lg:block"
             src={props.currentUserProfile?.avatar_url}
