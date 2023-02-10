@@ -51,6 +51,7 @@ const Forum = (props) => {
   const [selectedDiscussionId, setSelectedDiscussionId] = useState(null);
   const [selectedDiscussion, setSelectedDiscussion] = useState(null);
   const [selectedDiscussionPosts, setSelectedDiscussionPosts] = useState(null);
+  const [editPostId, setEditPostId] = useState(null);
   const [editPost, setEditPost] = useState(false);
   const [createNewPostContent, setCreateNewPostContent] = useState(false);
   const [createNewDiscussion, setCreateNewDiscussion] = useState(false);
@@ -472,6 +473,12 @@ const Forum = (props) => {
     }
 
     fetchUserProfile();
+  }
+
+  // When clicking on the edit post icon in the post
+  async function onClickIconEditPost(id) {
+    setEditPostId(id);
+    setEditPost(true);
   }
 
   // On click edit post
@@ -1559,7 +1566,7 @@ const Forum = (props) => {
                       </div>
                     </div>
                     <div className="text-gray-600 text-[14px] mt-4">
-                      {editPost ? (
+                      {editPost && editPostId === post.id ? (
                         <div className="flex flex-col gap 4">
                           <Editor
                             apiKey="5h30failckzmzz86haynxp1vhk7mvvc10go0aulj7v0f4llh"
@@ -1692,7 +1699,7 @@ const Forum = (props) => {
                             <div className="group flex flex-row gap-1">
                               <div
                                 className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-indigo-500 flex flex-row gap-1"
-                                onClick={() => setEditPost(true)}
+                                onClick={() => onClickIconEditPost(post.id)}
                               >
                                 <FontAwesomeIcon
                                   icon={faPen}
