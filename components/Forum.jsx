@@ -1186,52 +1186,62 @@ const Forum = (props) => {
 
   if (selectedFolder && !selectedDiscussion) {
     return (
-      <section className={`relative w-screen`}>
+      <section className={`relative w-[100%]`}>
         <div className="flex flex-row">
           {props.currentUserSession?.user?.aud === "authenticated" ? (
             <div className="flex flex-row gap-2">
-              <div className="group flex flex-row gap-1">
-                <div className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-indigo-500">
-                  <FontAwesomeIcon
-                    icon={faMessage}
-                    className="text-gray-400 text-[10px] group-hover:text-gray-600 group-hover:cursor-pointer group-hover:text-white"
-                  />
+              {!createNewFolder ? (
+                <div className="group flex flex-row gap-1">
+                  <div
+                    className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-indigo-500"
+                    onClick={() => setCreateNewDiscussion(true)}
+                  >
+                    <FontAwesomeIcon
+                      icon={faMessage}
+                      className="text-gray-400 text-[10px] group-hover:text-gray-600 group-hover:cursor-pointer group-hover:text-white"
+                    />
+                  </div>
+                  <div
+                    onClick={() => setCreateNewDiscussion(true)}
+                    className="text-gray-400 text-[10px] py-2 px-2 group-hover:text-gray-600 group-hover:cursor-pointer hidden lg:block"
+                  >
+                    Ny tråd
+                  </div>
                 </div>
-                <div
-                  onClick={() => setCreateNewDiscussion(true)}
-                  className="text-gray-400 text-[10px] py-2 px-2 group-hover:text-gray-600 group-hover:cursor-pointer"
-                >
-                  Ny tråd
+              ) : null}
+              {!createNewDiscussion ? (
+                <div className="group flex flex-row gap-1">
+                  <div
+                    className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-indigo-500"
+                    onClick={() => setCreateNewFolder(true)}
+                  >
+                    <FontAwesomeIcon
+                      icon={faFolder}
+                      className="text-gray-400 text-[10px] group-hover:text-gray-600 group-hover:cursor-pointer group-hover:text-white"
+                    />
+                  </div>
+                  <div
+                    onClick={() => setCreateNewFolder(true)}
+                    className="text-gray-400 text-[10px] py-2 px-2 group-hover:text-gray-600 group-hover:cursor-pointer hidden lg:block"
+                  >
+                    Ny mappe
+                  </div>
                 </div>
-              </div>
-              <div className="group flex flex-row gap-1">
-                <div className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-indigo-500">
-                  <FontAwesomeIcon
-                    icon={faFolder}
-                    className="text-gray-400 text-[10px] group-hover:text-gray-600 group-hover:cursor-pointer group-hover:text-white"
-                  />
-                </div>
-                <div
-                  onClick={() => setCreateNewFolder(true)}
-                  className="text-gray-400 text-[10px] py-2 px-2 group-hover:text-gray-600 group-hover:cursor-pointer"
-                >
-                  Ny mappe
-                </div>
-              </div>
+              ) : null}
             </div>
           ) : null}
         </div>
         <div className="flex flex-row flex-wrap">
           {selectedFolder.parent_array.map((parent, index) => (
             <div
-              className="text-gray-600 text-[12px] hover:text-indigo-500 hover:cursor-pointer mt-4 mb-2 ml-2 bg-gray-100 rounded-[24px] px-3 py-1"
+              className="text-gray-600 text-[12px] hover:text-indigo-500 hover:cursor-pointer mt-4 mb-2 ml-2 bg-gray-100 rounded-[24px] px-3 py-1 hidden lg:block"
               onClick={() => (window.location.href = `?folder=${parent.id}`)}
               key={index}
             >
               {parent.name}
             </div>
           ))}
-          <div className="text-white text-[12px] mt-4 mb-2 ml-2 bg-indigo-500 rounded-[24px] px-3 py-1">
+          <div className="text-white text-[12px] mt-4 mb-2 ml-2 bg-indigo-500 rounded-[24px] px-3 py-1 hidden lg:block">
             {selectedFolder.name}
           </div>
         </div>
@@ -1497,7 +1507,7 @@ const Forum = (props) => {
         <div className="flex flex-row flex-wrap">
           {selectedFolder.parent_array.map((parent, index) => (
             <div
-              className="text-gray-600 text-[12px] hover:text-indigo-500 hover:cursor-pointer mt-4 mb-2 ml-2 bg-gray-100 rounded-[24px] px-3 py-1"
+              className="text-gray-600 text-[12px] hover:text-indigo-500 hover:cursor-pointer mt-4 mb-2 ml-2 bg-gray-100 rounded-[24px] px-3 py-1 hidden lg:block"
               onClick={() => (window.location.href = `?folder=${parent.id}`)}
               key={index}
             >
@@ -1505,14 +1515,14 @@ const Forum = (props) => {
             </div>
           ))}
           <div
-            className="text-gray-600 text-[12px] hover:text-indigo-500 hover:cursor-pointer mt-4 mb-2 ml-2 bg-gray-100 rounded-[24px] px-3 py-1"
+            className="text-gray-600 text-[12px] hover:text-indigo-500 hover:cursor-pointer mt-4 mb-2 ml-2 bg-gray-100 rounded-[24px] px-3 py-1 hidden lg:block"
             onClick={() =>
               (window.location.href = `?folder=${selectedFolder.id}`)
             }
           >
             {selectedFolder.name}
           </div>
-          <div className="text-white text-[12px] mt-4 mb-2 ml-2 bg-indigo-500 rounded-[24px] px-3 py-1">
+          <div className="text-white text-[12px] mt-4 mb-2 ml-2 bg-indigo-500 rounded-[24px] px-3 py-1 hidden lg:block">
             {selectedDiscussion.title}
           </div>
         </div>
@@ -1622,7 +1632,7 @@ const Forum = (props) => {
                                     icon={faBookmark}
                                     className="text-white text-[15px] group-hover:text-white group-hover:cursor-pointer group-hover:text-white"
                                   />
-                                  <div className="text-white text-[10px] group-hover:text-white group-hover:cursor-pointer">
+                                  <div className="text-white text-[10px] group-hover:text-white group-hover:cursor-pointer hidden lg:block">
                                     Fjern fra lagrede tråder
                                   </div>
                                 </div>
@@ -1637,7 +1647,7 @@ const Forum = (props) => {
                                     icon={faBookmark}
                                     className="text-gray-400 text-[15px] group-hover:text-gray-600 group-hover:cursor-pointer group-hover:text-white"
                                   />
-                                  <div className="text-gray-400 text-[10px] group-hover:text-white group-hover:cursor-pointer">
+                                  <div className="text-gray-400 text-[10px] group-hover:text-white group-hover:cursor-pointer hidden lg:block">
                                     Lagre tråden
                                   </div>
                                 </div>
@@ -1663,7 +1673,7 @@ const Forum = (props) => {
                                 icon={faMessage}
                                 className="text-gray-400 text-[15px] group-hover:text-gray-600 group-hover:cursor-pointer group-hover:text-white"
                               />
-                              <div className="text-gray-400 text-[10px] group-hover:text-white group-hover:cursor-pointer">
+                              <div className="text-gray-400 text-[10px] group-hover:text-white group-hover:cursor-pointer hidden lg:block">
                                 Svar
                               </div>
                             </div>
@@ -1681,7 +1691,7 @@ const Forum = (props) => {
                                   icon={faPen}
                                   className="text-gray-400 text-[15px] group-hover:text-gray-600 group-hover:cursor-pointer group-hover:text-white"
                                 />
-                                <div className="text-gray-400 text-[10px] group-hover:text-white group-hover:cursor-pointer">
+                                <div className="text-gray-400 text-[10px] group-hover:text-white group-hover:cursor-pointer hidden lg:block">
                                   Rediger
                                 </div>
                               </div>
@@ -1701,7 +1711,7 @@ const Forum = (props) => {
                                   icon={faArchive}
                                   className="text-white text-[15px] group-hover:text-white group-hover:cursor-pointer group-hover:text-white"
                                 />
-                                <div className="text-white text-[10px] group-hover:text-white group-hover:cursor-pointer">
+                                <div className="text-white text-[10px] group-hover:text-white group-hover:cursor-pointer hidden lg:block">
                                   Fjern arkivering av denne tråden
                                 </div>
                               </div>
@@ -1714,7 +1724,7 @@ const Forum = (props) => {
                                   icon={faArchive}
                                   className="text-gray-400 text-[15px] group-hover:text-gray-600 group-hover:cursor-pointer group-hover:text-white"
                                 />
-                                <div className="text-gray-400 text-[10px] group-hover:text-white group-hover:cursor-pointer">
+                                <div className="text-gray-400 text-[10px] group-hover:text-white group-hover:cursor-pointer hidden lg:block">
                                   Arkiver denne tråden
                                 </div>
                               </div>
@@ -1798,7 +1808,10 @@ const Forum = (props) => {
         {props.currentUserSession?.user?.aud === "authenticated" ? (
           <div className="flex flex-row gap-2">
             <div className="group flex flex-row gap-1">
-              <div className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-indigo-500">
+              <div
+                className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-indigo-500"
+                onClick={() => setCreateNewFolder(true)}
+              >
                 <FontAwesomeIcon
                   icon={faFolder}
                   className="text-gray-400 text-[10px] group-hover:text-gray-600 group-hover:cursor-pointer group-hover:text-white"
@@ -1806,7 +1819,7 @@ const Forum = (props) => {
               </div>
               <div
                 onClick={() => setCreateNewFolder(true)}
-                className="text-gray-400 text-[10px] py-2 px-2 group-hover:text-gray-600 group-hover:cursor-pointer"
+                className="text-gray-400 text-[10px] py-2 px-2 group-hover:text-gray-600 group-hover:cursor-pointer hidden lg:block"
               >
                 Ny mappe
               </div>

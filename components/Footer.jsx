@@ -2,7 +2,7 @@
 
 import { socials } from "../constants";
 const Footer = () => (
-  <footer>
+  <footer className="hidden lg:block">
     <div className="footer-gradient" />
     <div className={`flex flex-col gap-8 bg-gray-600 px-4 py-4`}>
       <div className="flex flex-col">

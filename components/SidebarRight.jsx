@@ -52,7 +52,7 @@ const SidebarRight = (props) => {
     <div className="bg-gray-200 px-4 py-4 text-[12px] border-l-[1px] border-gray-300 min-h-screen h-[100%]">
       {props.currentUserSessionState === true ? (
         <div className="flex flex-col gap-2">
-          <div className="text-gray-600 text-[14px]">
+          <div className="text-gray-600 text-[14px] hidden lg:block">
             {props.currentUserSession?.user?.user_metadata?.full_name}
           </div>
           <img
@@ -135,7 +135,7 @@ const SidebarRight = (props) => {
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-[15px] w-[100%] min-w-[180px] mt-2 py-2 px-2 flex flex-col gap-2">
+          <div className="bg-white rounded-[15px] w-[100%] min-w-[180px] mt-2 py-2 px-2 flex flex-col gap-2 hidden lg:block">
             {links.map((link, index) => (
               <div className="flex flex-row gap-2 wrap group" key={index}>
                 <div className="bg-gray-100 rounded-full py-2 px-2 group-hover:bg-indigo-500 max-h-[35px]">
