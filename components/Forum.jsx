@@ -305,6 +305,7 @@ const Forum = (props) => {
             : props.currentUserSession?.user?.user_metadata?.user_name,
           parent: parent,
           parent_array: currentParrentArray,
+          created_by_id: props.currentUserSession?.user?.id,
         });
 
       if (errorFolder) {
@@ -362,6 +363,8 @@ const Forum = (props) => {
               ? props.currentUserProfile.user_name
               : props.currentUserSession?.user?.user_metadata?.user_name,
             discussion: data[0].id,
+            created_by_id: props.currentUserSession?.user?.id,
+            created_by_avatar_url: props.currentUserProfile?.avatar_url,
           });
         }
 
