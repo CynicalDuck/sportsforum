@@ -1202,19 +1202,19 @@ const Forum = (props) => {
           {props.currentUserSession?.user?.aud === "authenticated" ? (
             <div className="flex flex-row gap-2">
               {!createNewFolder ? (
-                <div className="group flex flex-row gap-1">
+                <div className="group flex flex-row gap-1 hover:bg-indigo-500 rounded-[10px]">
                   <div
                     className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-indigo-500"
                     onClick={() => setCreateNewDiscussion(true)}
                   >
                     <FontAwesomeIcon
                       icon={faMessage}
-                      className="text-gray-400 text-[11px] group-hover:text-gray-600 group-hover:cursor-pointer"
+                      className="text-gray-400 text-[11px] group-hover:text-white group-hover:cursor-pointer"
                     />
                   </div>
                   <div
                     onClick={() => setCreateNewDiscussion(true)}
-                    className="text-gray-400 text-[11px] py-2 px-2 group-hover:text-gray-600 group-hover:cursor-pointer hidden lg:block"
+                    className="text-gray-400 text-[11px] py-2 px-2 group-hover:text-white group-hover:cursor-pointer hidden lg:block"
                   >
                     Ny tråd
                   </div>
@@ -1223,19 +1223,19 @@ const Forum = (props) => {
               {!createNewDiscussion ? (
                 props.currentUserProfile?.is_mod ||
                 props.currentUserProfile?.is_admin ? (
-                  <div className="group flex flex-row gap-1">
+                  <div className="group flex flex-row gap-1 hover:bg-indigo-500 rounded-[10px]">
                     <div
                       className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-indigo-500"
                       onClick={() => setCreateNewFolder(true)}
                     >
                       <FontAwesomeIcon
                         icon={faFolder}
-                        className="text-gray-400 text-[11px] group-hover:text-gray-600 group-hover:cursor-pointer"
+                        className="text-gray-400 text-[11px] group-hover:text-white group-hover:cursor-pointer"
                       />
                     </div>
                     <div
                       onClick={() => setCreateNewFolder(true)}
-                      className="text-gray-400 text-[11px] py-2 px-2 group-hover:text-gray-600 group-hover:cursor-pointer hidden lg:block"
+                      className="text-gray-400 text-[11px] py-2 px-2 group-hover:text-white group-hover:cursor-pointer hidden lg:block"
                     >
                       Ny mappe
                     </div>
@@ -1823,19 +1823,19 @@ const Forum = (props) => {
           props.currentUserProfile?.is_mod ||
           props.currentUserProfile?.is_admin ? (
             <div className="flex flex-row gap-2">
-              <div className="group flex flex-row gap-1">
+              <div className="group flex flex-row gap-1 hover:bg-indigo-500 rounded-[10px]">
                 <div
                   className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-indigo-500"
                   onClick={() => setCreateNewFolder(true)}
                 >
                   <FontAwesomeIcon
                     icon={faFolder}
-                    className="text-gray-400 text-[11px] group-hover:text-gray-600 group-hover:cursor-pointer"
+                    className="text-gray-400 text-[11px] group-hover:text-white group-hover:cursor-pointer"
                   />
                 </div>
                 <div
                   onClick={() => setCreateNewFolder(true)}
-                  className="text-gray-400 text-[11px] py-2 px-2 group-hover:text-gray-600 group-hover:cursor-pointer hidden lg:block"
+                  className="text-gray-400 text-[11px] py-2 px-2 group-hover:text-white group-hover:cursor-pointer hidden lg:block"
                 >
                   Ny mappe
                 </div>
