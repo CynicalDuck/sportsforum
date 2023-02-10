@@ -389,6 +389,8 @@ const Forum = (props) => {
           ? props.currentUserProfile.user_name
           : props.currentUserSession?.user?.user_metadata?.user_name,
         discussion: selectedDiscussionId,
+        created_by_id: props.currentUserSession?.user?.id,
+        created_by_avatar_url: props.currentUserProfile?.avatar_url,
       });
 
       var total_posts = selectedDiscussion.total_posts + 1;
@@ -1184,7 +1186,7 @@ const Forum = (props) => {
 
   if (selectedFolder && !selectedDiscussion) {
     return (
-      <section className={`relative`}>
+      <section className={`relative w-screen`}>
         <div className="flex flex-row">
           {props.currentUserSession?.user?.aud === "authenticated" ? (
             <div className="flex flex-row gap-2">
@@ -1219,7 +1221,7 @@ const Forum = (props) => {
             </div>
           ) : null}
         </div>
-        <div className="flex flex-row">
+        <div className="flex flex-row flex-wrap">
           {selectedFolder.parent_array.map((parent, index) => (
             <div
               className="text-gray-600 text-[12px] hover:text-indigo-500 hover:cursor-pointer mt-4 mb-2 ml-2 bg-gray-100 rounded-[24px] px-3 py-1"
@@ -1492,7 +1494,7 @@ const Forum = (props) => {
   if (selectedFolder && selectedDiscussion) {
     return (
       <section className={`relative`}>
-        <div className="flex flex-row">
+        <div className="flex flex-row flex-wrap">
           {selectedFolder.parent_array.map((parent, index) => (
             <div
               className="text-gray-600 text-[12px] hover:text-indigo-500 hover:cursor-pointer mt-4 mb-2 ml-2 bg-gray-100 rounded-[24px] px-3 py-1"
@@ -1791,7 +1793,7 @@ const Forum = (props) => {
   }
 
   return (
-    <section className={`relative`}>
+    <section className={`relative w-auto`}>
       <div className="flex flex-row">
         {props.currentUserSession?.user?.aud === "authenticated" ? (
           <div className="flex flex-row gap-2">
