@@ -65,10 +65,10 @@ const SidebarRight = (props) => {
               <div className="bg-gray-100 rounded-full py-2 px-2">
                 <FontAwesomeIcon
                   icon={faUser}
-                  className="text-gray-400 text-[10px]"
+                  className="text-gray-400 text-[12px]"
                 />
               </div>
-              <div className="text-gray-400 text-[10px] py-2 px-2">
+              <div className="text-gray-400 text-[12px] py-2 px-2">
                 {props.currentUserProfile?.user_name
                   ? props.currentUserProfile?.user_name
                   : props.currentUserSession?.user?.user_metadata?.user_name}
@@ -78,10 +78,10 @@ const SidebarRight = (props) => {
               <div className="bg-gray-100 rounded-full py-2 px-2">
                 <FontAwesomeIcon
                   icon={faEnvelope}
-                  className="text-gray-400 text-[10px]"
+                  className="text-gray-400 text-[12px]"
                 />
               </div>
-              <div className="text-gray-400 text-[10px] py-2 px-2">
+              <div className="text-gray-400 text-[12px] py-2 px-2">
                 {props.currentUserSession?.user?.email}
               </div>
             </div>
@@ -92,11 +92,11 @@ const SidebarRight = (props) => {
               >
                 <FontAwesomeIcon
                   icon={faCog}
-                  className="text-gray-400 text-[10px] group-hover:text-gray-600 group-hover:cursor-pointer group-hover:text-white"
+                  className="text-gray-400 text-[12px] group-hover:text-gray-600 group-hover:cursor-pointer group-hover:text-white"
                 />
               </div>
               <div
-                className="text-gray-400 text-[10px] py-2 px-2 group-hover:text-gray-600 group-hover:cursor-pointer"
+                className="text-gray-400 text-[12px] py-2 px-2 group-hover:text-gray-600 group-hover:cursor-pointer"
                 onClick={() => props.setShowSettings(true)}
               >
                 Innstillinger
@@ -110,11 +110,11 @@ const SidebarRight = (props) => {
                 >
                   <FontAwesomeIcon
                     icon={faBoltLightning}
-                    className="text-gray-400 text-[10px] group-hover:text-gray-600 group-hover:cursor-pointer group-hover:text-white"
+                    className="text-gray-400 text-[12px] group-hover:text-gray-600 group-hover:cursor-pointer group-hover:text-white"
                   />
                 </div>
                 <div
-                  className="text-gray-400 text-[10px] py-2 px-2 group-hover:text-gray-600 group-hover:cursor-pointer"
+                  className="text-gray-400 text-[12px] py-2 px-2 group-hover:text-gray-600 group-hover:cursor-pointer"
                   onClick={() => props.setShowAdmin(true)}
                 >
                   Administrator
@@ -125,11 +125,11 @@ const SidebarRight = (props) => {
               <div className="bg-gray-100 rounded-full py-2 px-2 group-hover:bg-indigo-500">
                 <FontAwesomeIcon
                   icon={faSignOut}
-                  className="text-gray-400 text-[10px] group-hover:text-gray-600 group-hover:cursor-pointer group-hover:text-white"
+                  className="text-gray-400 text-[12px] group-hover:text-gray-600 group-hover:cursor-pointer group-hover:text-white"
                 />
               </div>
               <div
-                className="text-gray-400 text-[10px] py-2 px-2 group-hover:text-gray-600 group-hover:cursor-pointer"
+                className="text-gray-400 text-[12px] py-2 px-2 group-hover:text-gray-600 group-hover:cursor-pointer"
                 onClick={() => logout()}
               >
                 Logg ut
@@ -142,14 +142,14 @@ const SidebarRight = (props) => {
                 <div className="bg-gray-100 rounded-full py-2 px-2 group-hover:bg-indigo-500 max-h-[35px]">
                   <FontAwesomeIcon
                     icon={faExternalLink}
-                    className="text-gray-400 text-[10px] group-hover:text-gray-600 group-hover:cursor-pointer group-hover:text-white"
+                    className="text-gray-400 text-[12px] group-hover:text-gray-600 group-hover:cursor-pointer group-hover:text-white"
                     key={index}
                   />
                 </div>
                 <a
                   href={link.url}
                   key={index}
-                  className="text-gray-400 text-[10px] py-2 px-2 group-hover:text-gray-600 group-hover:cursor-pointer"
+                  className="text-gray-400 text-[12px] py-2 px-2 group-hover:text-gray-600 group-hover:cursor-pointer"
                   onClick={() => logout()}
                 >
                   {link.name}
@@ -190,13 +190,13 @@ const SidebarRight = (props) => {
           </form>
           <div className="flex flex-row gap-2 w-[100%]">
             <div
-              className="text-[10px] hover:text-indigo-500 hover:cursor-pointer"
+              className="text-[12px] hover:text-indigo-500 hover:cursor-pointer"
               onClick={() => props.setCreateNewUser(true)}
             >
               Registrer deg
             </div>
             <div
-              className="text-[10px] hover:text-indigo-500 hover:cursor-pointer"
+              className="text-[12px] hover:text-indigo-500 hover:cursor-pointer"
               onClick={() => props.setForgotPassword(true)}
             >
               Glemt passord
