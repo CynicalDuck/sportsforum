@@ -343,6 +343,7 @@ const Forum = (props) => {
           last_post_by: props.currentUserProfile.user_name
             ? props.currentUserProfile.user_name
             : props.currentUserSession?.user?.user_metadata?.user_name,
+          created_by_id: props.currentUserSession?.user?.id,
         })
         .select();
 
