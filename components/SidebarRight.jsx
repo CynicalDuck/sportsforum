@@ -85,71 +85,74 @@ const SidebarRight = (props) => {
                 {props.currentUserSession?.user?.email}
               </div>
             </div>
-            <div className="group flex flex-row gap-2 wrap">
+            <div className="group flex flex-row gap-2 wrap hover:bg-indigo-500 rounded-[10px]">
               <div
                 className="bg-gray-100 rounded-full py-2 px-2 group-hover:bg-indigo-500"
                 onClick={() => props.setShowSettings(true)}
               >
                 <FontAwesomeIcon
                   icon={faCog}
-                  className="text-gray-400 text-[12px] group-hover:text-gray-600 group-hover:cursor-pointer group-hover:text-white"
+                  className="text-gray-400 text-[12px]  group-hover:cursor-pointer group-hover:text-white"
                 />
               </div>
               <div
-                className="text-gray-400 text-[12px] py-2 px-2 group-hover:text-gray-600 group-hover:cursor-pointer"
+                className="text-gray-400 text-[12px] py-2 px-2 group-hover:text-white group-hover:cursor-pointer"
                 onClick={() => props.setShowSettings(true)}
               >
                 Innstillinger
               </div>
             </div>
             {props.currentUserProfile?.is_admin ? (
-              <div className="group flex flex-row gap-2 wrap">
+              <div className="group flex flex-row gap-2 wrap hover:bg-indigo-500 rounded-[10px]">
                 <div
                   className="bg-gray-100 rounded-full py-2 px-2 group-hover:bg-indigo-500"
                   onClick={() => props.setShowAdmin(true)}
                 >
                   <FontAwesomeIcon
                     icon={faBoltLightning}
-                    className="text-gray-400 text-[12px] group-hover:text-gray-600 group-hover:cursor-pointer group-hover:text-white"
+                    className="text-gray-400 text-[12px]  group-hover:cursor-pointer group-hover:text-white"
                   />
                 </div>
                 <div
-                  className="text-gray-400 text-[12px] py-2 px-2 group-hover:text-gray-600 group-hover:cursor-pointer"
+                  className="text-gray-400 text-[12px] py-2 px-2 group-hover:text-white group-hover:cursor-pointer"
                   onClick={() => props.setShowAdmin(true)}
                 >
                   Administrator
                 </div>
               </div>
             ) : null}
-            <div className="flex flex-row gap-2 wrap group">
+            <div className="flex flex-row gap-2 wrap group hover:bg-indigo-500 rounded-[10px]">
               <div className="bg-gray-100 rounded-full py-2 px-2 group-hover:bg-indigo-500">
                 <FontAwesomeIcon
                   icon={faSignOut}
-                  className="text-gray-400 text-[12px] group-hover:text-gray-600 group-hover:cursor-pointer group-hover:text-white"
+                  className="text-gray-400 text-[12px]  group-hover:cursor-pointer group-hover:text-white"
                 />
               </div>
               <div
-                className="text-gray-400 text-[12px] py-2 px-2 group-hover:text-gray-600 group-hover:cursor-pointer"
+                className="text-gray-400 text-[12px] py-2 px-2 group-hover:text-white group-hover:cursor-pointer"
                 onClick={() => logout()}
               >
                 Logg ut
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-[15px] w-[100%] min-w-[180px] mt-2 py-2 px-2 flex flex-col gap-2 hidden lg:block">
+          <div className="bg-white rounded-[15px] w-[100%] min-w-[180px] mt-2 py-2 px-2 flex flex-col gap-2 lg:block">
             {links.map((link, index) => (
-              <div className="flex flex-row gap-2 wrap group" key={index}>
-                <div className="bg-gray-100 rounded-full py-2 px-2 group-hover:bg-indigo-500 max-h-[35px]">
+              <div
+                className="flex flex-row gap-2 wrap group hover:bg-indigo-500 rounded-[10px] mt-2"
+                key={index}
+              >
+                <div className="bg-gray-100 rounded-full py-2 px-2 group-hover:bg-indigo-500 max-h-[35px] ">
                   <FontAwesomeIcon
                     icon={faExternalLink}
-                    className="text-gray-400 text-[12px] group-hover:text-gray-600 group-hover:cursor-pointer group-hover:text-white"
+                    className="text-gray-400 text-[12px]  group-hover:cursor-pointer group-hover:text-white"
                     key={index}
                   />
                 </div>
                 <a
                   href={link.url}
                   key={index}
-                  className="text-gray-400 text-[12px] py-2 px-2 group-hover:text-gray-600 group-hover:cursor-pointer"
+                  className="text-gray-400 text-[12px] py-2 px-2 group-hover:text-white group-hover:cursor-pointer"
                   onClick={() => logout()}
                 >
                   {link.name}

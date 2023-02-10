@@ -179,7 +179,7 @@ const Sidebar = (props) => {
             <div className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-indigo-500">
               <FontAwesomeIcon
                 icon={faBookmark}
-                className="text-gray-400 text-[12px] group-hover:text-white group-hover:cursor-pointer group-hover:text-white"
+                className="text-gray-400 text-[12px] group-hover:text-white group-hover:cursor-pointer "
               />
             </div>
             <a className="text-gray-400 text-[12px] py-2 px-2 group-hover:text-white group-hover:cursor-pointer">
@@ -206,7 +206,7 @@ const Sidebar = (props) => {
                         <div className="flex flex-row gap-1 relative">
                           <FontAwesomeIcon
                             icon={faTicket}
-                            className="text-gray-400 text-[12px] group-hover:text-white group-hover:cursor-pointer group-hover:text-white"
+                            className="text-gray-400 text-[12px] group-hover:text-white group-hover:cursor-pointer "
                           />
                           <div className="text-[8px] relative">
                             {bookmark.total_posts}
@@ -215,7 +215,7 @@ const Sidebar = (props) => {
                         <div className="flex flex-row gap-1 relative">
                           <FontAwesomeIcon
                             icon={faClock}
-                            className="text-gray-400 text-[12px] group-hover:text-white group-hover:cursor-pointer group-hover:text-white"
+                            className="text-gray-400 text-[12px] group-hover:text-white group-hover:cursor-pointer "
                           />
                           <div className="text-[8px] relative">
                             <Moment fromNow>{bookmark.last_post_at}</Moment>
@@ -226,7 +226,7 @@ const Sidebar = (props) => {
                         <div className="flex flex-row gap-1 relative">
                           <FontAwesomeIcon
                             icon={faUser}
-                            className="text-gray-400 text-[12px] group-hover:text-white group-hover:cursor-pointer group-hover:text-white"
+                            className="text-gray-400 text-[12px] group-hover:text-white group-hover:cursor-pointer "
                           />
                           <div className="text-[8px] relative">
                             {bookmark.last_post_by}
