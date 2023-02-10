@@ -156,7 +156,7 @@ const SidebarRight = (props) => {
               </div>
             ))}
           </div>
-          <div className="hidden lg:block">
+          <div className="">
             <a href="https://www.buymeacoffee.com/mariusbekkG">
               <img src="https://img.buymeacoffee.com/button-api/?text=Støtt drift og utvikling&emoji=&slug=mariusbekkG&button_colour=ffffff&font_colour=000000&font_family=Arial&outline_colour=000000&coffee_colour=FFDD00" />
             </a>
