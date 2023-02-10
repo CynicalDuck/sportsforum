@@ -15,11 +15,14 @@ import {
   faCog,
   faSignOut,
   faExternalLink,
+  faBoltLightning,
 } from "@fortawesome/free-solid-svg-icons";
 
 const SidebarRight = (props) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+
+  // FUNCTIONS
 
   async function login() {
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -28,10 +31,11 @@ const SidebarRight = (props) => {
     });
 
     if (error) {
-      console.log(error.message);
+      props.handleError(error.message);
     }
 
     if (data?.user?.aud === "authenticated") {
+      props.handleSuccess("Du er nå logget inn!");
       window.location.reload();
     }
   }
@@ -52,7 +56,7 @@ const SidebarRight = (props) => {
             {props.currentUserSession?.user?.user_metadata?.full_name}
           </div>
           <img
-            className="contain-avatar rounded-[24px] max-h-[180px] min-w-[180px] shadow-sm shadow-black"
+            className="contain-avatar rounded-[24px] max-h-[180px] min-w-[160px] max-w-[170px] shadow-sm shadow-black"
             src={props.currentUserProfile?.avatar_url}
           />
           <div className="bg-white rounded-[15px] h-[100%] w-[100%] min-w-[180px] mt-2 py-2 px-2 flex flex-col gap-2">
@@ -81,16 +85,41 @@ const SidebarRight = (props) => {
               </div>
             </div>
             <div className="group flex flex-row gap-2 wrap">
-              <div className="bg-gray-100 rounded-full py-2 px-2 group-hover:bg-indigo-500">
+              <div
+                className="bg-gray-100 rounded-full py-2 px-2 group-hover:bg-indigo-500"
+                onClick={() => props.setShowSettings(true)}
+              >
                 <FontAwesomeIcon
                   icon={faCog}
                   className="text-gray-400 text-[10px] group-hover:text-gray-600 group-hover:cursor-pointer group-hover:text-white"
                 />
               </div>
-              <div className="text-gray-400 text-[10px] py-2 px-2 group-hover:text-gray-600 group-hover:cursor-pointer">
+              <div
+                className="text-gray-400 text-[10px] py-2 px-2 group-hover:text-gray-600 group-hover:cursor-pointer"
+                onClick={() => props.setShowSettings(true)}
+              >
                 Innstillinger
               </div>
             </div>
+            {props.currentUserProfile?.is_admin ? (
+              <div className="group flex flex-row gap-2 wrap">
+                <div
+                  className="bg-gray-100 rounded-full py-2 px-2 group-hover:bg-indigo-500"
+                  onClick={() => props.setShowAdmin(true)}
+                >
+                  <FontAwesomeIcon
+                    icon={faBoltLightning}
+                    className="text-gray-400 text-[10px] group-hover:text-gray-600 group-hover:cursor-pointer group-hover:text-white"
+                  />
+                </div>
+                <div
+                  className="text-gray-400 text-[10px] py-2 px-2 group-hover:text-gray-600 group-hover:cursor-pointer"
+                  onClick={() => props.setShowAdmin(true)}
+                >
+                  Administrator
+                </div>
+              </div>
+            ) : null}
             <div className="flex flex-row gap-2 wrap group">
               <div className="bg-gray-100 rounded-full py-2 px-2 group-hover:bg-indigo-500">
                 <FontAwesomeIcon
@@ -130,7 +159,7 @@ const SidebarRight = (props) => {
         </div>
       ) : (
         <div className="flex flex-col gap-1">
-          <form>
+          <form action="javascript:void(0);">
             <input
               type="text"
               id="first_name"

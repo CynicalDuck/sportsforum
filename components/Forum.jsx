@@ -25,11 +25,16 @@ import {
   faBookmark,
   faThumbsUp,
   faTicket,
+  faPen,
+  faStop,
+  faArchive,
 } from "@fortawesome/free-solid-svg-icons";
 
 const Forum = (props) => {
   const editorRef = useRef(null);
+  const editorEditRef = useRef(null);
   const [userProfile, setUserProfile] = useState(null);
+  const [allUserProfiles, setAllUserProfiles] = useState(null);
   const [newUserEmail, setNewUserEmail] = useState("");
   const [newUserUsername, setNewUserUsername] = useState("");
   const [newUserFullName, setNewUserFullName] = useState("");
@@ -46,7 +51,7 @@ const Forum = (props) => {
   const [selectedDiscussionId, setSelectedDiscussionId] = useState(null);
   const [selectedDiscussion, setSelectedDiscussion] = useState(null);
   const [selectedDiscussionPosts, setSelectedDiscussionPosts] = useState(null);
-  const [createNewPost, setCreateNewPost] = useState(false);
+  const [editPost, setEditPost] = useState(false);
   const [createNewPostContent, setCreateNewPostContent] = useState(false);
   const [createNewDiscussion, setCreateNewDiscussion] = useState(false);
   const [createNewDiscussionTitle, setCreateNewDiscussionTitle] = useState("");
@@ -92,6 +97,17 @@ const Forum = (props) => {
     fetchFolders(selectedFolderId);
   }
 
+  // If the user is admin, load all user profiles for the administrator panel
+  if (
+    props.currentUserProfile &&
+    props.currentUserProfile.is_admin &&
+    !allUserProfiles
+  ) {
+    if (!allUserProfiles) {
+      fetchAllUserProfiles();
+    }
+  }
+
   // FUNCTIONS
   // Get updated user profile
   async function fetchUserProfile() {
@@ -114,6 +130,10 @@ const Forum = (props) => {
     if (!folders) {
       setFolders(data);
     }
+
+    if (error) {
+      props.handleError(error.message);
+    }
   }
 
   // Get the selected folder
@@ -126,6 +146,10 @@ const Forum = (props) => {
     if (data && !error && !selectedFolder) {
       setSelectedFolder(data[0]);
       fetchSelectedFolderDiscussions();
+    }
+
+    if (error) {
+      props.handleError(error.message);
     }
   }
 
@@ -140,6 +164,10 @@ const Forum = (props) => {
     if (data && !error && !selectedFolder) {
       setDiscussions(data);
     }
+
+    if (error) {
+      props.handleError(error.message);
+    }
   }
 
   // Get the selected discussion
@@ -151,6 +179,10 @@ const Forum = (props) => {
 
     if (data && !error && !selectedFolder) {
       setSelectedDiscussion(data[0]);
+    }
+
+    if (error) {
+      props.handleError(error.message);
     }
   }
 
@@ -165,22 +197,43 @@ const Forum = (props) => {
     if (data && !error && !selectedFolder) {
       setSelectedDiscussionPosts(data);
     }
+
+    if (error) {
+      props.handleError(error.message);
+    }
   }
 
   // Create new user
   async function onClickSubmitNewUser() {
-    const userData = await supabase.auth.signUp({
-      email: newUserEmail,
-      password: newUserPassword,
-      options: {
-        data: {
-          user_name: newUserUsername,
-          full_name: newUserFullName,
-        },
-      },
-    });
-
-    window.location.reload();
+    if (newUserPassword === newUserPasswordConfirm) {
+      if (newUserPassword.length >= 6) {
+        const { data, error } = await supabase.auth.signUp({
+          email: newUserEmail,
+          password: newUserPassword,
+          options: {
+            data: {
+              user_name: newUserUsername,
+              full_name: newUserFullName,
+            },
+          },
+        });
+        if (error) {
+          props.handleError(error.message);
+        }
+        if (!error) {
+          props.handleSuccess(
+            "Din bruker er opprettet. Du vil få en epost du må bekrefte."
+          );
+          setTimeout(() => {
+            //window.location.reload();
+          }, 3000);
+        }
+      } else {
+        props.handleError("Passordet er for kort. Minst 6 tegn.");
+      }
+    } else {
+      props.handleError("Passordene er ikke like.");
+    }
   }
 
   // Send reset email
@@ -193,8 +246,17 @@ const Forum = (props) => {
         }
       );
 
+      if (error) {
+        props.handleError(error.message);
+      }
+
       if (data) {
-        setResetPasswordSuccess(true);
+        props.handleSuccess(
+          "Passord reset lenke blir sendt til epost dersom den eksisterer i systemet."
+        );
+        setTimeout(() => {
+          setResetPasswordSuccess(true);
+        }, 3000);
       }
     }
   }
@@ -209,6 +271,10 @@ const Forum = (props) => {
         .from("folders")
         .select()
         .eq("id", parent);
+
+      if (error) {
+        props.handleError(error.message);
+      }
 
       if (data) {
         data[0].parent_array.forEach((arrayItem) => {
@@ -229,15 +295,24 @@ const Forum = (props) => {
       createNewFolderName?.length > 1 &&
       createNewFolderDescription?.length > 1
     ) {
-      await supabase.from("folders").insert({
-        name: createNewFolderName,
-        description: createNewFolderDescription,
-        created_by: props.currentUserProfile.user_name
-          ? props.currentUserProfile.user_name
-          : props.currentUserSession?.user?.user_metadata?.user_name,
-        parent: parent,
-        parent_array: currentParrentArray,
-      });
+      const { data: dataFolder, error: errorFolder } = await supabase
+        .from("folders")
+        .insert({
+          name: createNewFolderName,
+          description: createNewFolderDescription,
+          created_by: props.currentUserProfile.user_name
+            ? props.currentUserProfile.user_name
+            : props.currentUserSession?.user?.user_metadata?.user_name,
+          parent: parent,
+          parent_array: currentParrentArray,
+        });
+
+      if (errorFolder) {
+        props.handleError(errorFolder.message);
+      }
+      if (!errorFolder) {
+        props.handleSuccess("Mappen " + createNewFolderName + " er opprettet.");
+      }
 
       if (folders) {
         setFolders(null);
@@ -270,6 +345,15 @@ const Forum = (props) => {
         })
         .select();
 
+      if (error) {
+        props.handleError(error.message);
+      }
+      if (!error) {
+        props.handleSuccess(
+          "Tråden " + createNewDiscussionTitle + " er opprettet."
+        );
+      }
+
       if (data) {
         if (editorRef.current.getContent().length > 1) {
           await supabase.from("posts").insert({
@@ -299,7 +383,7 @@ const Forum = (props) => {
     }
 
     if (editorRef.current.getContent().length > 1) {
-      await supabase.from("posts").insert({
+      const { data, error } = await supabase.from("posts").insert({
         content: editorRef.current.getContent(),
         created_by: props.currentUserProfile.user_name
           ? props.currentUserProfile.user_name
@@ -310,7 +394,16 @@ const Forum = (props) => {
       var total_posts = selectedDiscussion.total_posts + 1;
       var last_post_at = new Date();
 
-      await supabase
+      if (error) {
+        props.handleError(error.message);
+      }
+      if (!error) {
+        props.handleSuccess(
+          "Tråden " + createNewDiscussionTitle + " er opprettet."
+        );
+      }
+
+      const { data: dataDiscussion, error: errorDiscussion } = await supabase
         .from("discussions")
         .update({
           total_posts: total_posts,
@@ -320,6 +413,13 @@ const Forum = (props) => {
           last_post_at: last_post_at,
         })
         .eq("id", selectedDiscussionId);
+
+      if (errorDiscussion) {
+        props.handleError(errorDiscussion.message);
+      }
+      if (!errorDiscussion) {
+        props.handleSuccess("Posten er opprettet.");
+      }
 
       if (discussions) {
         setSelectedDiscussionPosts(null);
@@ -343,7 +443,6 @@ const Forum = (props) => {
     if (existingBookmarks?.length > 0) {
       existingBookmarks.forEach((bookmark) => {
         if (bookmark !== id) {
-          console.log("bookmark: " + bookmark + " id: " + id);
           tempBookmarks.push(bookmark);
         }
       });
@@ -351,7 +450,7 @@ const Forum = (props) => {
         tempBookmarks.push(id);
       }
     } else {
-      tempBookmarks.push(id);
+      tempBookmarks.push(selectedDiscussionId);
     }
 
     const { error } = await supabase
@@ -360,10 +459,351 @@ const Forum = (props) => {
       .eq("user_id", props.currentUserSession?.user?.id);
 
     if (error) {
-      console.log(error);
+      props.handleError(error.message);
+    }
+    if (!error) {
+      props.handleSuccess("Bokmerke er oppdatert");
     }
 
     fetchUserProfile();
+  }
+
+  // On click edit post
+  async function onClickEditPost(post) {
+    const { error } = await supabase
+      .from("posts")
+      .update({
+        created_at: new Date(),
+        content: editorRef.current.getContent(),
+      })
+      .eq("id", post.id);
+
+    var last_post_at = new Date();
+
+    if (error) {
+      props.handleError(error.message);
+    }
+
+    const { error: errorDiscussion } = await supabase
+      .from("discussions")
+      .update({
+        last_post_at: last_post_at,
+      })
+      .eq("id", selectedDiscussionId);
+
+    if (errorDiscussion) {
+      props.handleError(errorDiscussion.message);
+    }
+    if (!error && !errorDiscussion) {
+      props.handleSuccess("Tråden er oppdatert");
+    }
+
+    window.location.reload();
+  }
+
+  // Archive discussion
+  async function onClickArchive() {
+    const { error } = await supabase
+      .from("discussions")
+      .update({
+        deleted: !selectedDiscussion.deleted,
+      })
+      .eq("id", selectedDiscussion.id);
+
+    if (error) {
+      props.handleError(error.message);
+    }
+    if (!error && selectedDiscussion.deleted === false) {
+      props.handleSuccess("Tråden er arkivert");
+    }
+    if (!error && selectedDiscussion.deleted === true) {
+      props.handleSuccess("Tråden er ikke arkivert lenger");
+    }
+
+    window.location.reload();
+  }
+
+  // Save settings
+  async function onClickSaveSettings(newImgUrl) {
+    var newEmail = props.currentUserSession?.user?.email;
+    var oldUserName = userProfile?.user_name
+      ? userProfile?.user_name
+      : props.currentUserProfile
+      ? props.currentUserProfile?.user_name
+      : null;
+    var newUserName = userProfile?.user_name
+      ? userProfile?.user_name
+      : props.currentUserProfile
+      ? props.currentUserProfile?.user_name
+      : null;
+    var newPassword = null;
+
+    // Check if email is changed
+    if (newUserEmail) {
+      newEmail = newUserEmail;
+    }
+    // Check if username is changed
+    if (newUserUsername) {
+      newUserName = newUserUsername;
+    }
+    // Check if password is changed and then check if it matches and is valid
+    if (newUserPassword && newUserPasswordConfirm) {
+      if (newUserPassword === newUserPasswordConfirm) {
+        if (newUserPassword.length >= 6) {
+          newPassword = newUserPassword;
+        } else {
+          props.handleError("Passordet må være minst 6 tegn");
+        }
+      } else {
+        props.handleError("Passordene er ikke like");
+      }
+    }
+
+    // Update user
+    const { data, error } = await supabase.auth.updateUser({
+      email: newEmail,
+      password: newPassword,
+    });
+
+    if (error) {
+      props.handleError(error.message);
+    }
+    if (!error) {
+      // Update user profile
+      const { error: errorProfile } = await supabase
+        .from("users")
+        .update({
+          user_name: newUserName,
+        })
+        .eq("user_id", props.currentUserSession?.user?.id);
+
+      if (errorProfile) {
+        props.handleError(errorProfile.message);
+      }
+
+      if (!errorProfile) {
+        // Update all post, discussions and comments created by user
+        const { error: errorDiscussion } = await supabase
+          .from("discussions")
+          .update({
+            created_by: newUserName,
+          })
+          .eq("created_by_id", props.currentUserSession?.user?.id);
+
+        if (errorDiscussion) {
+          props.handleError(errorDiscussion.message);
+        }
+
+        const { error: errorDiscussionLastPostBy } = await supabase
+          .from("discussions")
+          .update({
+            last_post_by: newUserName,
+          })
+          .eq("last_post_by", oldUserName);
+
+        const { error: errorPost } = await supabase
+          .from("posts")
+          .update({
+            created_by: newUserName,
+            created_by_avatar_url: newImgUrl
+              ? newImgUrl
+              : props.currentUserProfile?.avatar_url,
+          })
+          .eq("created_by_id", props.currentUserSession?.user?.id);
+
+        if (errorPost) {
+          props.handleError(errorPost.message);
+        }
+
+        const { error: errorFolder } = await supabase
+
+          .from("folders")
+          .update({
+            created_by: newUserName,
+          })
+          .eq("created_by_id", props.currentUserSession?.user?.id);
+
+        if (errorFolder) {
+          props.handleError(errorFolder.message);
+        }
+
+        if (!errorDiscussion && !errorPost && !errorFolder) {
+          props.handleSuccess("Brukeren er oppdatert");
+        }
+      }
+    }
+  }
+
+  // Upload avatar
+  async function uploadAvatar(e) {
+    const avatarFile = e.target.files[0];
+
+    // Check if file is an image
+    if (!avatarFile.type.includes("image")) {
+      props.handleError("Bildet er ikke et av de tillatte formatene");
+      // Check if file is smaller than 1MB
+      if (avatarFile.size > 1000000) {
+        props.handleError("Bildet er for stort. Maks 1MB");
+      }
+    }
+
+    // Deletes all files in bucket
+    const { data: dataList, error: errorList } = await supabase.storage
+      .from("images")
+      .list(props.currentUserSession?.user?.id, {
+        limit: 100,
+        offset: 0,
+        sortBy: { column: "name", order: "asc" },
+      });
+
+    dataList.forEach(async (file) => {
+      const { error: errorDelete } = await supabase.storage
+        .from("images")
+        .remove([props.currentUserSession?.user?.id + "/" + file.name]);
+    });
+
+    // Upload image to storage
+    const { data, error } = await supabase.storage
+      .from("images")
+      .upload(
+        "/" + props.currentUserSession?.user?.id + "/" + avatarFile.name,
+        avatarFile,
+        {
+          cacheControl: "3600",
+          upsert: false,
+        }
+      );
+
+    if (error) {
+      if (error.message === "The resource already exists") {
+        // Gets the url of the uploaded image
+        const { data: dataUrl, error: errorUrl } = supabase.storage
+          .from("images")
+          .getPublicUrl(
+            "/" + props.currentUserSession?.user?.id + "/" + avatarFile.name
+          );
+
+        if (errorUrl) {
+          props.handleError(
+            errorFile.message +
+              " ( Feil oppstått under henting av public url for bilde )"
+          );
+        }
+
+        if (!errorUrl) {
+          // Update user profile
+          const { data: dataProfile, error: errorProfile } = await supabase
+            .from("users")
+            .update({
+              avatar_url: dataUrl.publicUrl,
+              avatar_name: avatarFile.name,
+            })
+            .eq("user_id", props.currentUserSession?.user?.id);
+
+          if (errorProfile) {
+            props.handleError(errorProfile.message);
+          }
+
+          if (!errorProfile) {
+            onClickSaveSettings(dataUrl.publicUrl);
+            props.handleSuccess(
+              "Bildet er lastet opp, du må oppdatere siden for å se endringene."
+            );
+          }
+        }
+      } else {
+        props.handleError(error.message);
+      }
+    }
+
+    if (!error) {
+      // Gets the url of the uploaded image
+      const { data: dataUrl, error: errorUrl } = supabase.storage
+        .from("images")
+        .getPublicUrl(
+          "/" + props.currentUserSession?.user?.id + "/" + avatarFile.name
+        );
+
+      if (errorUrl) {
+        props.handleError(
+          errorFile.message +
+            " ( Feil oppstått under henting av public url for bilde )"
+        );
+      }
+
+      if (!errorUrl) {
+        // Update user profile
+        const { data: dataProfile, error: errorProfile } = await supabase
+          .from("users")
+          .update({
+            avatar_url: dataUrl.publicUrl,
+            avatar_name: avatarFile.name,
+          })
+          .eq("user_id", props.currentUserSession?.user?.id);
+
+        if (errorProfile) {
+          props.handleError(errorProfile.message);
+        }
+
+        if (!errorProfile) {
+          onClickSaveSettings(dataUrl.publicUrl);
+          props.handleSuccess(
+            "Bildet er lastet opp, du må oppdatere siden for å se endringene."
+          );
+        }
+      }
+    }
+  }
+
+  // Fetch all user profiles
+  async function fetchAllUserProfiles() {
+    const { data: dataProfiles, error: errorProfiles } = await supabase
+      .from("users")
+      .select("*");
+
+    if (errorProfiles) {
+      props.handleError(errorProfiles.message);
+    }
+
+    if (!errorProfiles) {
+      setAllUserProfiles(dataProfiles);
+    }
+  }
+
+  // Change user is mod
+  async function changeUserIsMod(value, profile) {
+    const { data: dataProfile, error: errorProfile } = await supabase
+      .from("users")
+      .update({
+        is_mod: value,
+      })
+      .eq("user_id", profile.user_id);
+
+    if (errorProfile) {
+      props.handleError(errorProfile.message);
+    }
+
+    if (!errorProfile) {
+      props.handleSuccess("Brukeren er oppdatert");
+    }
+  }
+
+  // Change user is admin
+  async function changeUserIsAdmin(value, profile) {
+    const { data: dataProfile, error: errorProfile } = await supabase
+      .from("users")
+      .update({
+        is_admin: value,
+      })
+      .eq("user_id", profile.user_id);
+
+    if (errorProfile) {
+      props.handleError(errorProfile.message);
+    }
+
+    if (!errorProfile) {
+      props.handleSuccess("Brukeren er oppdatert");
+    }
   }
 
   if (props.createNewUser) {
@@ -512,6 +952,178 @@ const Forum = (props) => {
                   Send reset e-post
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (props.showSettings) {
+    return (
+      <section className={``}>
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-6 gap-4">
+            <div className="col-span-1"></div>
+            <div className="col-span-4 bg-white rounded-[24px] py-4 px-4">
+              <div className="flex flex-col gap-1">
+                <input
+                  className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-indigo-500 mt-2 w-full"
+                  type="email"
+                  placeholder="E-post"
+                  defaultValue={props.currentUserSession?.user?.email}
+                  required
+                  onChange={(e) => {
+                    setNewUserEmail(e.target.value);
+                  }}
+                />
+                <div className="text-gray-400 text-[12px]">
+                  Dette er eposten du bruker for å logge inn på forumet.
+                </div>
+                <input
+                  className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-indigo-500 mt-2 w-full"
+                  type="text"
+                  placeholder="Brukernavn"
+                  defaultValue={
+                    userProfile?.user_name
+                      ? userProfile?.user_name
+                      : props.currentUserProfile
+                      ? props.currentUserProfile?.user_name
+                      : null
+                  }
+                  required
+                  onChange={(e) => {
+                    setNewUserUsername(e.target.value);
+                  }}
+                />
+                <div className="text-gray-400 text-[12px]">
+                  Her kan du endre ditt brukernavn, dette er navnet som er
+                  synlig for alle andre på forumet.
+                </div>
+                <input
+                  className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-indigo-500 mt-2 w-full"
+                  type="text"
+                  placeholder="Navn"
+                  disabled
+                  defaultValue={
+                    props.currentUserSession?.user?.user_metadata?.full_name
+                  }
+                  required
+                  onChange={(e) => {
+                    setNewUserFullName(e.target.value);
+                  }}
+                />
+                <div className="text-gray-400 text-[12px]">
+                  Du kan ikke endre navnet ditt, vennligst kontakt oss dersom du
+                  ønsker å endre dette.
+                </div>
+                <input
+                  onChange={(e) => uploadAvatar(e)}
+                  className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-indigo-500 mt-2 w-full"
+                  type="file"
+                  accept="image/*"
+                />
+                <div className="text-gray-400 text-[12px]">Profilbilde</div>
+                <input
+                  className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-indigo-500 mt-2 w-full"
+                  type="password"
+                  placeholder="Nytt passord"
+                  required
+                  onChange={(e) => {
+                    setNewUserPassword(e.target.value);
+                  }}
+                />
+                <input
+                  className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-indigo-500 mt-1 w-full"
+                  type="password"
+                  placeholder="Bekreft nytt passord"
+                  required
+                  onChange={(e) => {
+                    setNewUserPasswordConfirm(e.target.value);
+                  }}
+                />
+                <div className="flex flex-row gap-2 mt-6">
+                  <button
+                    type="button"
+                    className="bg-red-500 text-white rounded-[24px] px-4 py-2"
+                    onClick={() => props.setShowSettings(false)}
+                  >
+                    Avbryt
+                  </button>
+                  <button
+                    type="submit"
+                    className="bg-indigo-500 text-white rounded-[24px] px-4 py-2"
+                    onClick={() => onClickSaveSettings()}
+                  >
+                    Oppdater bruker
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (props.showAdmin) {
+    return (
+      <section>
+        <div className="container mx-auto px-4 text-gray-400 bg-white py-2 px-2 rounded-[14px]">
+          Administrator panelet
+          <div className="flex flex-col gap-2 mt-3">
+            <table>
+              <thead>
+                <tr>
+                  <th>Brukernavn</th>
+                  <th>Moderator</th>
+                  <th>Administrator</th>
+                </tr>
+              </thead>
+              <tbody>
+                {allUserProfiles
+                  ? allUserProfiles.map((profile) => (
+                      <tr>
+                        <td>{profile.user_name}</td>
+                        <td>
+                          <input
+                            className="object-center"
+                            type="checkbox"
+                            disabled={profile.is_super}
+                            id={profile.user_id}
+                            name={"checkbox_is_mod_" + profile.user_id}
+                            defaultChecked={profile.is_mod}
+                            onChange={(e) => {
+                              changeUserIsMod(e.target.checked, profile);
+                            }}
+                          />
+                        </td>
+                        <td>
+                          <input
+                            className="object-center"
+                            type="checkbox"
+                            disabled={profile.is_super}
+                            id={profile.user_id}
+                            name={"checkbox_is_admin_" + profile.user_id}
+                            defaultChecked={profile.is_admin}
+                            onChange={(e) => {
+                              changeUserIsAdmin(e.target.checked, profile);
+                            }}
+                          />
+                        </td>
+                      </tr>
+                    ))
+                  : null}
+              </tbody>
+            </table>
+            <div className="flex flex-row gap-2 mt-6">
+              <button
+                type="button"
+                className="bg-indigo-500 text-white rounded-[24px] px-4 py-2"
+                onClick={() => props.setShowAdmin(false)}
+              >
+                Lukk administrator panelet
+              </button>
             </div>
           </div>
         </div>
@@ -910,7 +1522,7 @@ const Forum = (props) => {
                   <div className="flex flex-col gap-2">
                     <div className="flex flex-row gap-2">
                       <img
-                        src={props.currentUserProfile?.avatar_url}
+                        src={post.created_by_avatar_url}
                         className="w-12 h-12 rounded-[4px] shadow-sm shadow-black"
                       />
                       <div className="flex flex-col">
@@ -926,126 +1538,250 @@ const Forum = (props) => {
                       </div>
                     </div>
                     <div className="text-gray-600 text-[14px] mt-4">
-                      <div dangerouslySetInnerHTML={{ __html: post.content }} />
-                    </div>
-                    <div className="flex flex-row gap-3">
-                      {index === 0 ? (
-                        <div className="group flex flex-row gap-1">
-                          {userProfile?.bookmarks.includes(
-                            selectedDiscussion.id
-                          ) ? (
-                            <div
-                              className="bg-indigo-500 rounded-[10px] py-2 px-2 group-hover:bg-indigo-600 flex flex-row gap-1"
-                              onClick={() =>
-                                onClickBookmark(selectedDiscussion.id)
-                              }
+                      {editPost ? (
+                        <div className="flex flex-col gap 4">
+                          <Editor
+                            apiKey="5h30failckzmzz86haynxp1vhk7mvvc10go0aulj7v0f4llh"
+                            initialValue={post.content}
+                            onInit={(evt, editor) =>
+                              (editorRef.current = editor)
+                            }
+                            init={{
+                              height: 500,
+                              menubar: false,
+                              plugins: [
+                                "advlist",
+                                "autolink",
+                                "lists",
+                                "link",
+                                "image",
+                                "charmap",
+                                "preview",
+                                "anchor",
+                                "searchreplace",
+                                "visualblocks",
+                                "code",
+                                "fullscreen",
+                                "insertdatetime",
+                                "media",
+                                "table",
+                                "code",
+                                "help",
+                                "wordcount",
+                                "emoticons",
+                              ],
+                              toolbar:
+                                "undo redo | blocks | " +
+                                "bold italic forecolor | alignleft aligncenter " +
+                                "alignright alignjustify | bullist numlist outdent indent | " +
+                                "emoticons | table | removeformat | link  | image | code | fullscreen | help",
+                              content_style:
+                                "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+                            }}
+                          />
+                          <div className="flex flex-row gap-2">
+                            <button
+                              className="bg-red-500 text-white rounded-[24px] px-4 py-2 mt-4"
+                              onClick={() => setEditPost(false)}
                             >
-                              <FontAwesomeIcon
-                                icon={faBookmark}
-                                className="text-white text-[15px] group-hover:text-white group-hover:cursor-pointer group-hover:text-white"
-                              />
-                              <div className="text-white text-[10px] group-hover:text-white group-hover:cursor-pointer">
-                                Fjern tråden fra lagrede tråder
-                              </div>
+                              Avbryt
+                            </button>
+                            <button
+                              className="bg-indigo-500 text-white rounded-[24px] px-4 py-2 mt-4"
+                              onClick={() => onClickEditPost(post)}
+                            >
+                              Post
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div
+                          dangerouslySetInnerHTML={{ __html: post.content }}
+                        />
+                      )}
+                    </div>
+                    {props.currentUserSession?.user?.aud === "authenticated" ? (
+                      <div className="flex flex-row gap-3">
+                        {index === 0 ? (
+                          !selectedDiscussion.deleted ? (
+                            <div className="group flex flex-row gap-1">
+                              {userProfile?.bookmarks?.includes(
+                                selectedDiscussion.id
+                              ) ? (
+                                <div
+                                  className="bg-indigo-500 rounded-[10px] py-2 px-2 group-hover:bg-indigo-600 flex flex-row gap-1"
+                                  onClick={() =>
+                                    onClickBookmark(selectedDiscussion.id)
+                                  }
+                                >
+                                  <FontAwesomeIcon
+                                    icon={faBookmark}
+                                    className="text-white text-[15px] group-hover:text-white group-hover:cursor-pointer group-hover:text-white"
+                                  />
+                                  <div className="text-white text-[10px] group-hover:text-white group-hover:cursor-pointer">
+                                    Fjern fra lagrede tråder
+                                  </div>
+                                </div>
+                              ) : (
+                                <div
+                                  className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-indigo-500 flex flex-row gap-1"
+                                  onClick={() =>
+                                    onClickBookmark(selectedDiscussion.id)
+                                  }
+                                >
+                                  <FontAwesomeIcon
+                                    icon={faBookmark}
+                                    className="text-gray-400 text-[15px] group-hover:text-gray-600 group-hover:cursor-pointer group-hover:text-white"
+                                  />
+                                  <div className="text-gray-400 text-[10px] group-hover:text-white group-hover:cursor-pointer">
+                                    Lagre tråden
+                                  </div>
+                                </div>
+                              )}
                             </div>
-                          ) : (
+                          ) : null
+                        ) : null}
+                        {selectedDiscussion.deleted ? null : (
+                          <div className="group flex flex-row gap-1">
                             <div
                               className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-indigo-500 flex flex-row gap-1"
                               onClick={() =>
-                                onClickBookmark(selectedDiscussion.id)
+                                editorRef.current.setContent(
+                                  "<p><q>" +
+                                    post.created_by +
+                                    " skrev:</q></p>" +
+                                    post.content +
+                                    "</q></p><hr><br />"
+                                )
                               }
                             >
                               <FontAwesomeIcon
-                                icon={faBookmark}
+                                icon={faMessage}
                                 className="text-gray-400 text-[15px] group-hover:text-gray-600 group-hover:cursor-pointer group-hover:text-white"
                               />
                               <div className="text-gray-400 text-[10px] group-hover:text-white group-hover:cursor-pointer">
-                                Lagre tråden
+                                Svar
                               </div>
                             </div>
-                          )}
-                        </div>
-                      ) : null}
-                      <div className="group flex flex-row gap-1">
-                        <div
-                          className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-indigo-500 flex flex-row gap-1"
-                          onClick={() =>
-                            editorRef.current.setContent(
-                              "<p><q>" +
-                                post.created_by +
-                                " skrev:</q></p>" +
-                                post.content +
-                                "</q></p><hr><br />"
-                            )
-                          }
-                        >
-                          <FontAwesomeIcon
-                            icon={faMessage}
-                            className="text-gray-400 text-[15px] group-hover:text-gray-600 group-hover:cursor-pointer group-hover:text-white"
-                          />
-                          <div className="text-gray-400 text-[10px] group-hover:text-white group-hover:cursor-pointer">
-                            Svar
                           </div>
-                        </div>
+                        )}
+                        {props.currentUserProfile?.user_name ===
+                        post.created_by ? (
+                          selectedDiscussion.deleted ? null : (
+                            <div className="group flex flex-row gap-1">
+                              <div
+                                className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-indigo-500 flex flex-row gap-1"
+                                onClick={() => setEditPost(true)}
+                              >
+                                <FontAwesomeIcon
+                                  icon={faPen}
+                                  className="text-gray-400 text-[15px] group-hover:text-gray-600 group-hover:cursor-pointer group-hover:text-white"
+                                />
+                                <div className="text-gray-400 text-[10px] group-hover:text-white group-hover:cursor-pointer">
+                                  Rediger
+                                </div>
+                              </div>
+                            </div>
+                          )
+                        ) : null}
+                        {index === 0 &&
+                        props.currentUserProfile?.user_name ===
+                          selectedDiscussion.created_by ? (
+                          <div className="group flex flex-row gap-1">
+                            {selectedDiscussion.deleted ? (
+                              <div
+                                className="bg-indigo-500 rounded-[10px] py-2 px-2 group-hover:bg-indigo-600 flex flex-row gap-1"
+                                onClick={() => onClickArchive()}
+                              >
+                                <FontAwesomeIcon
+                                  icon={faArchive}
+                                  className="text-white text-[15px] group-hover:text-white group-hover:cursor-pointer group-hover:text-white"
+                                />
+                                <div className="text-white text-[10px] group-hover:text-white group-hover:cursor-pointer">
+                                  Fjern arkivering av denne tråden
+                                </div>
+                              </div>
+                            ) : (
+                              <div
+                                className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-indigo-500 flex flex-row gap-1"
+                                onClick={() => onClickArchive()}
+                              >
+                                <FontAwesomeIcon
+                                  icon={faArchive}
+                                  className="text-gray-400 text-[15px] group-hover:text-gray-600 group-hover:cursor-pointer group-hover:text-white"
+                                />
+                                <div className="text-gray-400 text-[10px] group-hover:text-white group-hover:cursor-pointer">
+                                  Arkiver denne tråden
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        ) : null}
+                        {selectedDiscussion.deleted ? null : (
+                          <div className="group flex flex-row gap-1">
+                            <div className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-indigo-500 flex flex-row gap-1">
+                              <FontAwesomeIcon
+                                icon={faThumbsUp}
+                                className="text-gray-400 text-[15px] group-hover:text-gray-600 group-hover:cursor-pointer group-hover:text-white"
+                              />
+                            </div>
+                          </div>
+                        )}
                       </div>
-                      <div className="group flex flex-row gap-1">
-                        <div className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-indigo-500 flex flex-row gap-1">
-                          <FontAwesomeIcon
-                            icon={faThumbsUp}
-                            className="text-gray-400 text-[15px] group-hover:text-gray-600 group-hover:cursor-pointer group-hover:text-white"
-                          />
-                        </div>
-                      </div>
-                    </div>
+                    ) : null}
                   </div>
                 </div>
               ))
             : "Ingen har postet noe her enda"}
           {props.currentUserSession?.user?.aud === "authenticated" ? (
-            <div className="flex flex-col gap 4">
-              <Editor
-                apiKey="5h30failckzmzz86haynxp1vhk7mvvc10go0aulj7v0f4llh"
-                onInit={(evt, editor) => (editorRef.current = editor)}
-                init={{
-                  height: 500,
-                  menubar: false,
-                  plugins: [
-                    "advlist",
-                    "autolink",
-                    "lists",
-                    "link",
-                    "image",
-                    "charmap",
-                    "preview",
-                    "anchor",
-                    "searchreplace",
-                    "visualblocks",
-                    "code",
-                    "fullscreen",
-                    "insertdatetime",
-                    "media",
-                    "table",
-                    "code",
-                    "help",
-                    "wordcount",
-                    "emoticons",
-                  ],
-                  toolbar:
-                    "undo redo | blocks | " +
-                    "bold italic forecolor | alignleft aligncenter " +
-                    "alignright alignjustify | bullist numlist outdent indent | " +
-                    "emoticons | removeformat | link  | image | code | fullscreen | help",
-                  content_style:
-                    "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
-                }}
-              />
-              <button
-                className="bg-indigo-500 text-white rounded-[24px] px-4 py-2 mt-4"
-                onClick={() => createDiscussionPost()}
-              >
-                Post
-              </button>
-            </div>
+            !editPost ? (
+              selectedDiscussion.deleted ? null : (
+                <div className="flex flex-col gap 4">
+                  <Editor
+                    apiKey="5h30failckzmzz86haynxp1vhk7mvvc10go0aulj7v0f4llh"
+                    onInit={(evt, editor) => (editorRef.current = editor)}
+                    init={{
+                      height: 500,
+                      menubar: false,
+                      plugins: [
+                        "advlist",
+                        "autolink",
+                        "lists",
+                        "link",
+                        "image",
+                        "charmap",
+                        "preview",
+                        "anchor",
+                        "searchreplace",
+                        "visualblocks",
+                        "code",
+                        "fullscreen",
+                        "insertdatetime",
+                        "media",
+                        "table",
+                        "code",
+                        "help",
+                        "wordcount",
+                        "emoticons",
+                      ],
+                      toolbar:
+                        "undo redo | blocks | " +
+                        "bold italic forecolor | alignleft aligncenter " +
+                        "alignright alignjustify | bullist numlist outdent indent | " +
+                        "emoticons | table | removeformat | link  | image | code | fullscreen | help",
+                      content_style:
+                        "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+                    }}
+                  />
+                  <button
+                    className="bg-indigo-500 text-white rounded-[24px] px-4 py-2 mt-4"
+                    onClick={() => createDiscussionPost()}
+                  >
+                    Post
+                  </button>
+                </div>
+              )
+            ) : null
           ) : null}
         </div>
       </section>
