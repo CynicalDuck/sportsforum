@@ -1198,7 +1198,7 @@ const Forum = (props) => {
                   >
                     <FontAwesomeIcon
                       icon={faMessage}
-                      className="text-gray-400 text-[10px] group-hover:text-gray-600 group-hover:cursor-pointer group-hover:text-white"
+                      className="text-gray-400 text-[10px] group-hover:text-gray-600 group-hover:cursor-pointer"
                     />
                   </div>
                   <div
@@ -1210,23 +1210,26 @@ const Forum = (props) => {
                 </div>
               ) : null}
               {!createNewDiscussion ? (
-                <div className="group flex flex-row gap-1">
-                  <div
-                    className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-indigo-500"
-                    onClick={() => setCreateNewFolder(true)}
-                  >
-                    <FontAwesomeIcon
-                      icon={faFolder}
-                      className="text-gray-400 text-[10px] group-hover:text-gray-600 group-hover:cursor-pointer group-hover:text-white"
-                    />
+                props.currentUserProfile?.is_mod ||
+                props.currentUserProfile?.is_admin ? (
+                  <div className="group flex flex-row gap-1">
+                    <div
+                      className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-indigo-500"
+                      onClick={() => setCreateNewFolder(true)}
+                    >
+                      <FontAwesomeIcon
+                        icon={faFolder}
+                        className="text-gray-400 text-[10px] group-hover:text-gray-600 group-hover:cursor-pointer"
+                      />
+                    </div>
+                    <div
+                      onClick={() => setCreateNewFolder(true)}
+                      className="text-gray-400 text-[10px] py-2 px-2 group-hover:text-gray-600 group-hover:cursor-pointer hidden lg:block"
+                    >
+                      Ny mappe
+                    </div>
                   </div>
-                  <div
-                    onClick={() => setCreateNewFolder(true)}
-                    className="text-gray-400 text-[10px] py-2 px-2 group-hover:text-gray-600 group-hover:cursor-pointer hidden lg:block"
-                  >
-                    Ny mappe
-                  </div>
-                </div>
+                ) : null
               ) : null}
             </div>
           ) : null}
@@ -1806,25 +1809,28 @@ const Forum = (props) => {
     <section className={`relative w-auto`}>
       <div className="flex flex-row">
         {props.currentUserSession?.user?.aud === "authenticated" ? (
-          <div className="flex flex-row gap-2">
-            <div className="group flex flex-row gap-1">
-              <div
-                className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-indigo-500"
-                onClick={() => setCreateNewFolder(true)}
-              >
-                <FontAwesomeIcon
-                  icon={faFolder}
-                  className="text-gray-400 text-[10px] group-hover:text-gray-600 group-hover:cursor-pointer group-hover:text-white"
-                />
-              </div>
-              <div
-                onClick={() => setCreateNewFolder(true)}
-                className="text-gray-400 text-[10px] py-2 px-2 group-hover:text-gray-600 group-hover:cursor-pointer hidden lg:block"
-              >
-                Ny mappe
+          props.currentUserProfile?.is_mod ||
+          props.currentUserProfile?.is_admin ? (
+            <div className="flex flex-row gap-2">
+              <div className="group flex flex-row gap-1">
+                <div
+                  className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-indigo-500"
+                  onClick={() => setCreateNewFolder(true)}
+                >
+                  <FontAwesomeIcon
+                    icon={faFolder}
+                    className="text-gray-400 text-[10px] group-hover:text-gray-600 group-hover:cursor-pointer"
+                  />
+                </div>
+                <div
+                  onClick={() => setCreateNewFolder(true)}
+                  className="text-gray-400 text-[10px] py-2 px-2 group-hover:text-gray-600 group-hover:cursor-pointer hidden lg:block"
+                >
+                  Ny mappe
+                </div>
               </div>
             </div>
-          </div>
+          ) : null
         ) : null}
       </div>
       {createNewFolder ? (
