@@ -91,19 +91,19 @@ const Sidebar = (props) => {
   }
 
   return (
-    <div className="bg-gray-200 px-4 py-4 text-[12px] border-r-[1px] border-gray-300 min-h-screen h-[100%]">
+    <div className="bg-gray-200 px-4 py-4 text-[0.7rem] border-r-[1px] border-gray-300 min-h-screen h-[100%]">
       {props.currentUserSessionState === true ? (
         <div className="flex flex-col gap-3">
           <div className="group flex flex-row gap-1 hover:bg-indigo-500 rounded-[10px]">
             <div className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-indigo-500">
               <FontAwesomeIcon
                 icon={faHome}
-                className="text-gray-400 text-[12px] group-hover:text-white group-hover:cursor-pointer"
+                className="text-gray-500 text-[0.7rem] group-hover:text-white group-hover:cursor-pointer"
               />
             </div>
             <a
               href="/"
-              className="text-gray-400 text-[12px] py-2 px-2 group-hover:text-white group-hover:cursor-pointer"
+              className="text-gray-500 text-[0.7rem] py-2 px-2 group-hover:text-white group-hover:cursor-pointer"
             >
               Hjem
             </a>
@@ -115,10 +115,10 @@ const Sidebar = (props) => {
             <div className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-indigo-500">
               <FontAwesomeIcon
                 icon={faMessage}
-                className="text-gray-400 text-[12px] group-hover:text-white group-hover:cursor-pointer"
+                className="text-gray-500 text-[0.7rem] group-hover:text-white group-hover:cursor-pointer"
               />
             </div>
-            <a className="text-gray-400 text-[12px] py-2 px-2 group-hover:text-white group-hover:cursor-pointer group-hover:bg-indigo-500">
+            <a className="text-gray-500 text-[0.7rem] py-2 px-2 group-hover:text-white group-hover:cursor-pointer group-hover:bg-indigo-500">
               Dine tråder
             </a>
           </div>
@@ -128,7 +128,7 @@ const Sidebar = (props) => {
                 return (
                   <div
                     key={index}
-                    className="group bg-gray-200 text-gray-400 rounded-[10px] px-2 py-2 hover:bg-indigo-500 hover:text-white hover:cursor-pointer capitalize text-[12px]"
+                    className="group bg-gray-200 text-gray-500 rounded-[10px] px-2 py-2 hover:bg-indigo-500 hover:text-white hover:cursor-pointer capitalize text-[0.7rem]"
                     onClick={() => {
                       window.location.href = `/?folder=${discussion.parent_folder}&discussion=${discussion.id}`;
                     }}
@@ -139,7 +139,7 @@ const Sidebar = (props) => {
                         <div className="flex flex-row gap-1 relative">
                           <FontAwesomeIcon
                             icon={faTicket}
-                            className="text-gray-400 text-[12px] group-hover:text-white group-hover:cursor-pointer "
+                            className="text-gray-500 text-[0.7rem] group-hover:text-white group-hover:cursor-pointer "
                           />
                           <div className="text-[8px] relative">
                             {discussion.total_posts}
@@ -148,7 +148,7 @@ const Sidebar = (props) => {
                         <div className="flex flex-row gap-1 relative">
                           <FontAwesomeIcon
                             icon={faClock}
-                            className="text-gray-400 text-[12px] group-hover:text-white group-hover:cursor-pointer "
+                            className="text-gray-500 text-[0.7rem] group-hover:text-white group-hover:cursor-pointer "
                           />
                           <div className="text-[8px] relative">
                             <Moment fromNow>{discussion.last_post_at}</Moment>
@@ -159,7 +159,7 @@ const Sidebar = (props) => {
                         <div className="flex flex-row gap-1 relative">
                           <FontAwesomeIcon
                             icon={faUser}
-                            className="text-gray-400 text-[12px] group-hover:text-white group-hover:cursor-pointer "
+                            className="text-gray-500 text-[0.7rem] group-hover:text-white group-hover:cursor-pointer "
                           />
                           <div className="text-[8px] relative">
                             {discussion.last_post_by}
@@ -179,10 +179,10 @@ const Sidebar = (props) => {
             <div className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-indigo-500">
               <FontAwesomeIcon
                 icon={faBookmark}
-                className="text-gray-400 text-[12px] group-hover:text-white group-hover:cursor-pointer "
+                className="text-gray-500 text-[0.7rem] group-hover:text-white group-hover:cursor-pointer "
               />
             </div>
-            <a className="text-gray-400 text-[12px] py-2 px-2 group-hover:text-white group-hover:cursor-pointer">
+            <a className="text-gray-500 text-[0.7rem] py-2 px-2 group-hover:text-white group-hover:cursor-pointer">
               Lagrede tråder{" "}
               {userProfile?.bookmarks?.length
                 ? `(${userProfile?.bookmarks?.length})`
@@ -195,7 +195,7 @@ const Sidebar = (props) => {
                 return (
                   <div
                     key={index}
-                    className="group bg-gray-200 text-gray-400 rounded-[10px] px-2 py-2 hover:bg-indigo-500 hover:text-white hover:cursor-pointer capitalize text-[12px]"
+                    className="group bg-gray-200 text-gray-500 rounded-[10px] px-2 py-2 hover:bg-indigo-500 hover:text-white hover:cursor-pointer capitalize text-[0.7rem]"
                     onClick={() => {
                       window.location.href = `/?folder=${bookmark.parent_folder}&discussion=${bookmark.id}`;
                     }}
@@ -206,7 +206,7 @@ const Sidebar = (props) => {
                         <div className="flex flex-row gap-1 relative">
                           <FontAwesomeIcon
                             icon={faTicket}
-                            className="text-gray-400 text-[12px] group-hover:text-white group-hover:cursor-pointer "
+                            className="text-gray-500 text-[0.7rem] group-hover:text-white group-hover:cursor-pointer "
                           />
                           <div className="text-[8px] relative">
                             {bookmark.total_posts}
@@ -215,7 +215,7 @@ const Sidebar = (props) => {
                         <div className="flex flex-row gap-1 relative">
                           <FontAwesomeIcon
                             icon={faClock}
-                            className="text-gray-400 text-[12px] group-hover:text-white group-hover:cursor-pointer "
+                            className="text-gray-500 text-[0.7rem] group-hover:text-white group-hover:cursor-pointer "
                           />
                           <div className="text-[8px] relative">
                             <Moment fromNow>{bookmark.last_post_at}</Moment>
@@ -226,7 +226,7 @@ const Sidebar = (props) => {
                         <div className="flex flex-row gap-1 relative">
                           <FontAwesomeIcon
                             icon={faUser}
-                            className="text-gray-400 text-[12px] group-hover:text-white group-hover:cursor-pointer "
+                            className="text-gray-500 text-[0.7rem] group-hover:text-white group-hover:cursor-pointer "
                           />
                           <div className="text-[8px] relative">
                             {bookmark.last_post_by}
