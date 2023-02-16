@@ -53,7 +53,7 @@ const SidebarRight = (props) => {
   }
 
   return (
-    <div className="bg-gray-200 px-4 py-4 text-[0.7rem] border-gray-300 min-h-screen h-[100%] lg:border-l-[1px]">
+    <div className="bg-gray-200 px-4 py-4 text-[0.8rem] border-gray-300 min-h-screen h-[100%] lg:border-l-[1px]">
       {props.currentUserSessionState === true ? (
         <div className="flex flex-col gap-2">
           <img
@@ -65,10 +65,10 @@ const SidebarRight = (props) => {
               <div className="bg-gray-100 rounded-full py-2 px-2">
                 <FontAwesomeIcon
                   icon={faUser}
-                  className="text-gray-500 text-[0.7rem]"
+                  className="text-gray-500 text-[0.8rem]"
                 />
               </div>
-              <div className="text-gray-500 text-[0.7rem] py-2 px-2">
+              <div className="text-gray-500 text-[0.8rem] py-2 px-2">
                 {props.currentUserProfile?.user_name
                   ? props.currentUserProfile?.user_name
                   : props.currentUserSession?.user?.user_metadata?.user_name}
@@ -81,11 +81,11 @@ const SidebarRight = (props) => {
               >
                 <FontAwesomeIcon
                   icon={faCog}
-                  className="text-gray-500 text-[0.7rem]  group-hover:cursor-pointer group-hover:text-white"
+                  className="text-gray-500 text-[0.8rem]  group-hover:cursor-pointer group-hover:text-white"
                 />
               </div>
               <div
-                className="text-gray-500 text-[0.7rem] py-2 px-2 group-hover:text-white group-hover:cursor-pointer"
+                className="text-gray-500 text-[0.8rem] py-2 px-2 group-hover:text-white group-hover:cursor-pointer"
                 onClick={() => props.setShowSettings(true)}
               >
                 Innstillinger
@@ -99,11 +99,11 @@ const SidebarRight = (props) => {
                 >
                   <FontAwesomeIcon
                     icon={faBoltLightning}
-                    className="text-gray-500 text-[0.7rem]  group-hover:cursor-pointer group-hover:text-white"
+                    className="text-gray-500 text-[0.8rem]  group-hover:cursor-pointer group-hover:text-white"
                   />
                 </div>
                 <div
-                  className="text-gray-500 text-[0.7rem] py-2 px-2 group-hover:text-white group-hover:cursor-pointer"
+                  className="text-gray-500 text-[0.8rem] py-2 px-2 group-hover:text-white group-hover:cursor-pointer"
                   onClick={() => props.setShowAdmin(true)}
                 >
                   Administrator
@@ -114,11 +114,11 @@ const SidebarRight = (props) => {
               <div className="bg-gray-100 rounded-full py-2 px-2 group-hover:bg-indigo-500">
                 <FontAwesomeIcon
                   icon={faSignOut}
-                  className="text-gray-500 text-[0.7rem]  group-hover:cursor-pointer group-hover:text-white"
+                  className="text-gray-500 text-[0.8rem]  group-hover:cursor-pointer group-hover:text-white"
                 />
               </div>
               <div
-                className="text-gray-500 text-[0.7rem] py-2 px-2 group-hover:text-white group-hover:cursor-pointer"
+                className="text-gray-500 text-[0.8rem] py-2 px-2 group-hover:text-white group-hover:cursor-pointer"
                 onClick={() => logout()}
               >
                 Logg ut
@@ -134,26 +134,28 @@ const SidebarRight = (props) => {
                 <div className="bg-gray-100 rounded-full py-2 px-2 group-hover:bg-indigo-500 max-h-[35px] ">
                   <FontAwesomeIcon
                     icon={faExternalLink}
-                    className="text-gray-500 text-[0.7rem]  group-hover:cursor-pointer group-hover:text-white"
+                    className="text-gray-500 text-[0.8rem]  group-hover:cursor-pointer group-hover:text-white"
                     key={index}
                   />
                 </div>
                 <a
                   href={link.url}
+                  target={link.target}
                   key={index}
-                  className="text-gray-500 text-[0.7rem] py-2 px-2 group-hover:text-white group-hover:cursor-pointer"
-                  onClick={() => logout()}
+                  className="text-gray-500 text-[0.8rem] py-2 px-2 group-hover:text-white group-hover:cursor-pointer"
                 >
                   {link.name}
                 </a>
               </div>
             ))}
           </div>
-          <div className="">
-            <a href="https://www.buymeacoffee.com/mariusbekkG">
-              <img src="https://img.buymeacoffee.com/button-api/?text=Støtt drift og utvikling&emoji=&slug=mariusbekkG&button_colour=ffffff&font_colour=000000&font_family=Arial&outline_colour=000000&coffee_colour=FFDD00" />
-            </a>
-          </div>
+          {props.currentUserProfile?.hide_donation_widget ? null : (
+            <div className="">
+              <a href="https://www.buymeacoffee.com/mariusbekkG">
+                <img src="https://img.buymeacoffee.com/button-api/?text=Støtt drift og utvikling&emoji=&slug=mariusbekkG&button_colour=ffffff&font_colour=000000&font_family=Arial&outline_colour=000000&coffee_colour=FFDD00" />
+              </a>
+            </div>
+          )}
         </div>
       ) : (
         <div className="flex flex-col gap-1 sm:flex-row md:flex-col lg:flex-col">
@@ -182,13 +184,13 @@ const SidebarRight = (props) => {
           </form>
           <div className="flex flex-row gap-2 w-[100%]">
             <div
-              className="text-[0.7rem] hover:text-indigo-500 hover:cursor-pointer"
+              className="text-[0.8rem] hover:text-indigo-500 hover:cursor-pointer"
               onClick={() => props.setCreateNewUser(true)}
             >
               Registrer deg
             </div>
             <div
-              className="text-[0.7rem] hover:text-indigo-500 hover:cursor-pointer"
+              className="text-[0.8rem] hover:text-indigo-500 hover:cursor-pointer"
               onClick={() => props.setForgotPassword(true)}
             >
               Glemt passord

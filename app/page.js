@@ -6,7 +6,13 @@ import { useEffect, useState } from "react";
 import { Footer, Navbar, Sidebar } from "../components";
 import { FrontPage, Hero } from "../sections";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
+
 const Page = () => {
+  const [render, setRender] = useState(false);
+  const [boardSettings, setBoardSettings] = useState(null);
   const [currentUserSessionState, setCurrentUserSessionState] = useState(null);
   const [currentUserSession, setCurrentUserSession] = useState(null);
   const [currentUserProfile, setCurrentUserProfile] = useState(null);
@@ -14,9 +20,12 @@ const Page = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [showMessage, setShowMessage] = useState(false);
   const [message, setMessage] = useState("");
+  const [announcements, setAnnouncements] = useState(null);
 
   useEffect(() => {
     checkLoginState();
+    getBoardSettings();
+    getAnnouncements();
   }, []);
 
   if (
@@ -94,6 +103,62 @@ const Page = () => {
     }
   }
 
+  // Get board settings
+  async function getBoardSettings() {
+    const { data, error } = await supabase
+      .from("settings")
+      .select()
+      .eq("id", 1);
+
+    if (data && boardSettings === null) {
+      setBoardSettings(data[0]);
+    }
+
+    if (error) {
+      handleError(error.message);
+    }
+  }
+
+  // Get announcements
+  async function getAnnouncements() {
+    const { data, error } = await supabase.from("announcements").select();
+
+    if (data && announcements === null) {
+      setAnnouncements(data);
+    }
+
+    if (error) {
+      handleError(error.message);
+    }
+  }
+
+  // Close announcement
+  async function closeAnnouncement(announcement) {
+    var array = [];
+
+    if (announcement.seen_by) {
+      array = announcement.seen_by;
+    }
+
+    array.push(currentUserProfile.user_id);
+
+    const { data, error } = await supabase
+      .from("announcements")
+      .update({
+        seen_by: array,
+      })
+      .eq("id", announcement.id);
+
+    if (!error) {
+      getAnnouncements();
+      window.location.reload();
+    }
+
+    if (error) {
+      handleError(error.message);
+    }
+  }
+
   if (currentUserSession) {
     checkForUserProfile();
   }
@@ -101,18 +166,38 @@ const Page = () => {
   if (currentUserProfile && currentUserSession && currentUserSessionState) {
     return (
       <div className="bg-gray-200 min-h-screen h-[100%]">
-        <Navbar />
+        <Navbar boardSettings={boardSettings} />
+        {announcements
+          ? announcements.map((announcement, index) =>
+              announcement.seen_by?.includes(
+                currentUserProfile?.user_id
+              ) ? null : (
+                <div
+                  className="flex flex-row gap-4 bg-gray-500 text-white py-2 px-2 mx-2 my-2 rounded-[1rem]"
+                  key={index}
+                >
+                  <FontAwesomeIcon
+                    icon={faXmark}
+                    className="text-white text-[1.1rem] hover:cursor-pointer"
+                    onClick={() => closeAnnouncement(announcement)}
+                  />
+                  <div className="text-[0.8rem]">{announcement.content}</div>
+                </div>
+              )
+            )
+          : null}
         {showError ? (
-          <div className="bg-red-500 text-white rounded-[15px] p-2 mt-3">
+          <div className="bg-red-500 text-white rounded-[15px] p-2 mt-3 mx-2">
             {"En feil har oppstått: " + errorMessage}
           </div>
         ) : null}
         {showMessage ? (
-          <div className="bg-green-500 text-white text-[12px] rounded-[15px] p-2 mt-2 mb-2">
+          <div className="bg-green-500 text-white text-[12px] rounded-[15px] p-2 mt-2 mb-2 mx-2">
             {message}
           </div>
         ) : null}
         <FrontPage
+          boardSettings={boardSettings}
           currentUserSession={currentUserSession}
           currentUserSessionState={currentUserSessionState}
           currentUserProfile={currentUserProfile}
@@ -122,6 +207,8 @@ const Page = () => {
           handleSuccess={handleSuccess}
           showMessage={showMessage}
           message={message}
+          render={render}
+          setRender={setRender}
         />
         <Footer />
       </div>
