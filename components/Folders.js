@@ -19,6 +19,9 @@ import {
   faUser,
   faClock,
   faPen,
+  faTicket,
+  faNewspaper,
+  faMessage,
 } from "@fortawesome/free-solid-svg-icons";
 
 const Folders = (props) => {
@@ -48,55 +51,92 @@ const Folders = (props) => {
     ? folders.map(
         (folder, index) =>
           folder.deleted === false && (
-            <div
-              className="group bg-white rounded-[15px] px-2 py-2 hover:cursor-pointer hover:bg-gray-300"
-              key={index}
-              onClick={() => {
-                window.location.href = `?folder=${folder.id}`;
-              }}
-            >
-              <div className="flex flex-row gap-1">
+            <div className="bg-white rounded-[1rem]" key={index}>
+              <div
+                className=" group flex flex-row gap-1 bg-secondary-gray rounded-t-[1rem] hover:cursor-pointer hover:bg-primary-indigo"
+                onClick={() => {
+                  window.location.href = `?folder=${folder.id}`;
+                }}
+              >
                 <FontAwesomeIcon
                   icon={faFolder}
-                  className="text-gray-400 text-[0.7rem] group-hover:text-indigo-500 group-hover:cursor-pointerpy-3 px-2"
+                  className="text-secondary-text text-[0.7rem] group-hover:text-white group-hover:cursor-pointerpy-3 px-2 py-3"
                 />
-                <div className="text-gray-400 text-[0.7rem] py-2 px-2 group-hover:text-gray-600 group-hover:cursor-pointer">
-                  <div className="text-gray-600 text-[0.9rem]">
-                    {folder.name}
-                  </div>
+                <div className="text-primary-text text-[0.9rem] py-2 px-2 group-hover:text-white group-hover:cursor-pointer">
+                  {folder.name}
                 </div>
               </div>
               <div className="flex flex-row gap-1">
                 <FontAwesomeIcon
                   icon={faInfo}
-                  className="text-gray-400 text-[0.7rem] group-hover:cursor-pointer py-3 px-3"
+                  className="text-secondary-text text-[0.7rem] group-hover:cursor-pointer py-3 px-3"
                 />
-                <div className="text-gray-400 text-[0.8rem] py-2 px-2 group-hover:text-gray-600 group-hover:cursor-pointer">
-                  <div className="text-gray-600 text-[0.7rem]">
+                <div className="text-secondary-text text-[0.8rem] py-2 px-2 group-hover:text-primary-text group-hover:cursor-pointer">
+                  <div className="text-primary-text text-[0.7rem]">
                     {folder.description}
                   </div>
                 </div>
               </div>
-              <div className="flex flex-row gap-4">
+              <div className="flex flex-row gap-1 ml-2 flex-wrap">
+                <div className="flex flex-row">
+                  <div className="text-secondary-text text-[0.7rem] py-2 group-hover:text-primary-text group-hover:cursor-pointer">
+                    Siste aktivitet:
+                  </div>
+                </div>
                 <div className="flex flex-row">
                   <FontAwesomeIcon
                     icon={faClock}
-                    className="text-gray-400 text-[0.7rem] group-hover:cursor-pointer py-3 px-3"
+                    className="text-secondary-text text-[0.7rem] group-hover:cursor-pointer py-3 px-3"
                   />
-                  <div className="text-gray-400 text-[0.7rem] py-2 group-hover:text-gray-600 group-hover:cursor-pointer">
-                    <div className="text-gray-400 text-[0.7rem]">
-                      <Moment fromNow>{folder.modified}</Moment>
+                  <div className="text-secondary-text text-[0.7rem] py-2 group-hover:text-primary-text group-hover:cursor-pointer">
+                    <div className="text-secondary-text text-[0.7rem]">
+                      <Moment fromNow>
+                        {folder.last_post_at
+                          ? folder.last_post_at
+                          : folder.modified}
+                      </Moment>
                     </div>
                   </div>
                 </div>
                 <div className="flex flex-row">
                   <FontAwesomeIcon
                     icon={faUser}
-                    className="text-gray-400 text-[0.7rem] group-hover:cursor-pointer py-3 px-3"
+                    className="text-secondary-text text-[0.7rem] group-hover:cursor-pointer py-3 px-3"
                   />
-                  <div className="text-gray-400 text-[0.7rem] py-2 group-hover:text-gray-600 group-hover:cursor-pointer">
-                    <div className="text-gray-400 text-[0.7rem]">
-                      {folder.created_by}
+                  <div className="text-secondary-text text-[0.7rem] py-2 group-hover:text-primary-text group-hover:cursor-pointer">
+                    <div className="text-secondary-text text-[0.7rem]">
+                      {folder.last_post_by
+                        ? folder.last_post_by
+                        : folder.created_by}
+                    </div>
+                  </div>
+                </div>
+                <div
+                  className="group flex flex-row text-secondary-text  hover:text-primary-indigo text-[0.7rem]"
+                  onClick={() => {
+                    window.location.href = folder.latest_activity_discussion?.id
+                      ? `?discussion=${folder.latest_activity_discussion.id}`
+                      : `?folder=${folder.id}`;
+                  }}
+                >
+                  <FontAwesomeIcon
+                    icon={faMessage}
+                    className="group-hover:cursor-pointer py-3 px-3"
+                  />
+                  <div className="py-2 group-hover:text-primary-text group-hover:cursor-pointer">
+                    {folder.latest_activity_discussion
+                      ? folder.latest_activity_discussion
+                      : "Ingen aktivitet"}
+                  </div>
+                </div>
+                <div className="flex flex-row">
+                  <FontAwesomeIcon
+                    icon={faTicket}
+                    className="text-secondary-text text-[0.7rem] group-hover:cursor-pointer py-3 px-3"
+                  />
+                  <div className="text-secondary-text text-[0.7rem] py-2 group-hover:text-primary-text group-hover:cursor-pointer">
+                    <div className="text-secondary-text text-[0.7rem]">
+                      {folder.total_posts ? folder.total_posts : 0}
                     </div>
                   </div>
                 </div>

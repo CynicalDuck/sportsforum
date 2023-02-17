@@ -70,7 +70,18 @@ const Posts = (props) => {
         props.handleError(error.message);
       }
       if (!error) {
-        props.handleSuccess("Tråden er slettet");
+        // Update the folders total_posts count by removing the number of total posts in the discussion
+        const { error } = await supabase
+          .from("folders")
+          .update({ total_posts: props.discussion.total_posts * -1 })
+          .eq("id", props.discussion.parent_folder);
+
+        if (error) {
+          props.handleError(error.message);
+        }
+        if (!error) {
+          props.handleSuccess("Tråden er slettet");
+        }
       }
 
       window.location.href = "/?folder=" + props.discussion.parent_folder;
@@ -81,10 +92,31 @@ const Posts = (props) => {
         props.handleError(error.message);
       }
       if (!error) {
-        props.handleSuccess("Posten er slettet");
-      }
+        // Edit the total_posts count in discussions and folders
+        const { error } = await supabase
+          .from("discussions")
+          .update({ total_posts: props.discussion.total_posts - 1 })
+          .eq("id", props.discussion.id);
 
-      window.location.reload();
+        if (error) {
+          props.handleError(error.message);
+        }
+        if (!error) {
+          // Edit the total_posts count in discussions and folders
+          const { error } = await supabase
+            .from("folders")
+            .update({ total_posts: props.discussion.total_posts - 1 })
+            .eq("id", props.discussion.parent_folder);
+
+          if (error) {
+            props.handleError(error.message);
+          }
+          if (!error) {
+            props.handleSuccess("Posten er slettet");
+            window.location.reload();
+          }
+        }
+      }
     }
   }
 
@@ -502,7 +534,7 @@ const Posts = (props) => {
                     </div>
                     <div className="flex flex-row gap-2">
                       <button
-                        className="bg-indigo-500 hover:bg-indigo-600 text-white text-[0.9rem] rounded-[10px] px-2 py-2 hover:cursor-pointer"
+                        className="bg-primary-indigo hover:bg-indigo-600 text-white text-[0.9rem] rounded-[10px] px-2 py-2 hover:cursor-pointer"
                         onClick={() => {
                           setDeletePostId(null), setShowConfirmDelete(false);
                         }}
@@ -523,7 +555,7 @@ const Posts = (props) => {
                       <div className="flex flex-row gap-2">
                         <input
                           type="text"
-                          className="border border-gray-300 rounded-[24px] px-2 py-2 focus:outline-indigo-500"
+                          className="border border-gray-300 rounded-[24px] px-2 py-2 focus:outline-primary-indigo"
                           placeholder="Trådtittel"
                           defaultValue={props.discussion.title}
                           onChange={(e) =>
@@ -532,7 +564,7 @@ const Posts = (props) => {
                         ></input>
                         <button
                           type="button"
-                          className="bg-indigo-500 text-white rounded-[24px] px-4 py-2 hover:bg-indigo-600"
+                          className="bg-primary-indigo text-white rounded-[24px] px-4 py-2 hover:bg-indigo-600"
                           onClick={() =>
                             onClickSaveEditThreadTitle(props.discussion)
                           }
@@ -544,13 +576,13 @@ const Posts = (props) => {
                         </button>
                       </div>
                     ) : (
-                      <div className="flex flex-row gap-2">
+                      <div className="flex flex-row gap-2 text-[1rem]">
                         {props.discussion.title}
                         {props.discussion.created_by_id ===
                         props.currentUserProfile?.user_id ? (
                           <FontAwesomeIcon
                             icon={faEdit}
-                            className="text-[1rem] text-gray-400 hover:cursor-pointer hover:text-indigo-500"
+                            className=" text-gray-400 hover:cursor-pointer hover:text-primary-indigo"
                             onClick={() => {
                               setEditThreadTitle(true);
                             }}
@@ -567,8 +599,11 @@ const Posts = (props) => {
                       className="w-12 h-12 rounded-[4px] shadow-sm shadow-black"
                     />
                     <div className="flex flex-col">
-                      <div className="text-gray-600 text-[0.9rem] hover:text-indigo-500 hover:cursor-pointer">
-                        {post.created_by}
+                      <div className="text-gray-600 text-[0.9rem] hover:text-primary-indigo hover:cursor-pointer">
+                        {props.discussion.created_by_id ===
+                        props.currentUserProfile?.user_id
+                          ? "[OP] " + post.created_by
+                          : post.created_by}
                       </div>
                       <div className="text-gray-400 text-[0.7rem]">
                         #{index + 1}
@@ -593,6 +628,7 @@ const Posts = (props) => {
                             postButton={true}
                             abortButton={true}
                             abortButtonAction={() => setEditPost(false)}
+                            folder={props.folder}
                           />
                         ) : null}
                         {post.type === "vote" ? (
@@ -603,7 +639,7 @@ const Posts = (props) => {
                             >
                               <FontAwesomeIcon
                                 icon={faPlus}
-                                className="text-gray-500 text-[1.2rem] group-hover:text-indigo-500 group-hover:cursor-pointer "
+                                className="text-gray-500 text-[1.2rem] group-hover:text-primary-indigo group-hover:cursor-pointer "
                               />
                               <div className="text-gray-500 text-[0.8rem]">
                                 Legg til flere valgalternativer
@@ -612,7 +648,7 @@ const Posts = (props) => {
                             <input
                               type="text"
                               id={"voteTitle"}
-                              className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-indigo-500 mb-1 w-full"
+                              className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-primary-indigo mb-1 w-full"
                               placeholder={"Tittel på avstemming"}
                               defaultValue={post.content}
                               required
@@ -622,7 +658,7 @@ const Posts = (props) => {
                                 type="text"
                                 key={index}
                                 id={"vote" + index}
-                                className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-indigo-500 mb-1 w-full"
+                                className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-primary-indigo mb-1 w-full"
                                 defaultValue={item.text}
                                 required
                               ></input>
@@ -634,7 +670,7 @@ const Posts = (props) => {
                                 id={
                                   "new_vote" + (index + post.vote_values.length)
                                 }
-                                className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-indigo-500 mb-1 w-full"
+                                className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-primary-indigo mb-1 w-full"
                                 placeholder={
                                   "Valgalternativ " +
                                   (item + post.vote_values.length)
@@ -651,7 +687,7 @@ const Posts = (props) => {
                               >
                                 <FontAwesomeIcon
                                   icon={faMinus}
-                                  className="text-gray-500 text-[1.2rem] group-hover:text-indigo-500 group-hover:cursor-pointer "
+                                  className="text-gray-500 text-[1.2rem] group-hover:text-primary-indigo group-hover:cursor-pointer "
                                 />
                                 <div className="text-gray-500 text-[0.8rem]">
                                   Fjern valgalternativ
@@ -667,7 +703,7 @@ const Posts = (props) => {
                                 Avbryt
                               </button>
                               <button
-                                className="bg-indigo-500 hover:bg-indigo-600 hover:cursor-pointer text-white rounded-[24px] px-4 py-2 mt-4"
+                                className="bg-primary-indigo hover:bg-indigo-600 hover:cursor-pointer text-white rounded-[24px] px-4 py-2 mt-4"
                                 onClick={() => onClickSaveEditVotePost(post)}
                               >
                                 Lagre endringer
@@ -714,7 +750,7 @@ const Posts = (props) => {
                               props.discussion.id
                             ) ? (
                               <div
-                                className="bg-indigo-500 rounded-[10px] py-2 px-2 group-hover:bg-indigo-600 flex flex-row gap-1"
+                                className="bg-primary-indigo rounded-[10px] py-2 px-2 group-hover:bg-indigo-600 flex flex-row gap-1"
                                 onClick={() =>
                                   onClickBookmark(props.discussion.id)
                                 }
@@ -729,7 +765,7 @@ const Posts = (props) => {
                               </div>
                             ) : (
                               <div
-                                className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-indigo-500 flex flex-row gap-1"
+                                className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-primary-indigo flex flex-row gap-1"
                                 onClick={() =>
                                   onClickBookmark(props.discussion.id)
                                 }
@@ -749,7 +785,7 @@ const Posts = (props) => {
                       {props.discussion.deleted ? null : (
                         <div className="group flex flex-row gap-1">
                           <div
-                            className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-indigo-500 flex flex-row gap-1"
+                            className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-primary-indigo flex flex-row gap-1"
                             onClick={() => onClickReplyPost(post)}
                           >
                             <FontAwesomeIcon
@@ -767,7 +803,7 @@ const Posts = (props) => {
                         props.discussion.deleted ? null : (
                           <div className="group flex flex-row gap-1">
                             <div
-                              className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-indigo-500 flex flex-row gap-1"
+                              className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-primary-indigo flex flex-row gap-1"
                               onClick={() => onClickIconEditPost(post)}
                             >
                               <FontAwesomeIcon
@@ -788,7 +824,7 @@ const Posts = (props) => {
                         <div className="group flex flex-row gap-1">
                           {props.discussion.deleted ? (
                             <div
-                              className="bg-indigo-500 rounded-[10px] py-2 px-2 group-hover:bg-indigo-600 flex flex-row gap-1"
+                              className="bg-primary-indigo rounded-[10px] py-2 px-2 group-hover:bg-indigo-600 flex flex-row gap-1"
                               onClick={() => onClickArchive()}
                             >
                               <FontAwesomeIcon
@@ -801,7 +837,7 @@ const Posts = (props) => {
                             </div>
                           ) : (
                             <div
-                              className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-indigo-500 flex flex-row gap-1"
+                              className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-primary-indigo flex flex-row gap-1"
                               onClick={() => onClickArchive()}
                             >
                               <FontAwesomeIcon
@@ -822,8 +858,8 @@ const Posts = (props) => {
                               post.liked_by?.includes(
                                 props.currentUserProfile?.user_name
                               )
-                                ? "group bg-indigo-500 text-white hover:bg-indigo-600 rounded-[10px] py-2 px-2 flex flex-row gap-1 hover:cursor-pointer"
-                                : "group bg-gray-100 rounded-[10px] py-2 px-2 hover:bg-indigo-500 flex flex-row gap-1 hover:cursor-pointer"
+                                ? "group bg-primary-indigo text-white hover:bg-indigo-600 rounded-[10px] py-2 px-2 flex flex-row gap-1 hover:cursor-pointer"
+                                : "group bg-gray-100 rounded-[10px] py-2 px-2 hover:bg-primary-indigo flex flex-row gap-1 hover:cursor-pointer"
                             }
                             onClick={() => onClickLikeButton(post)}
                           >
@@ -856,7 +892,7 @@ const Posts = (props) => {
                           className="group flex flex-row gap-1"
                           onClick={() => onClickDeletePost(post.id)}
                         >
-                          <div className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-indigo-500 flex flex-row gap-1 hover:cursor-pointer">
+                          <div className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-primary-indigo flex flex-row gap-1 hover:cursor-pointer">
                             <FontAwesomeIcon
                               icon={faTrashCan}
                               className="text-gray-400 text-[15px] group-hover:text-white"
@@ -885,6 +921,7 @@ const Posts = (props) => {
                   handleSuccess={props.handleSuccess}
                   postButton={!props.discussion.deleted}
                   abortButton={false}
+                  folder={props.folder}
                 />
               ) : (
                 <div className="flex flex-col gap-2">
@@ -894,7 +931,7 @@ const Posts = (props) => {
                         className={
                           createPostType === "post"
                             ? "bg-indigo-600 hover:bg-indigo-700 hover:cursor-pointer text-white rounded-[24px] px-4 py-2 mt-4"
-                            : "bg-indigo-500 hover:bg-indigo-600 hover:cursor-pointer text-white rounded-[24px] px-4 py-2 mt-4"
+                            : "bg-primary-indigo hover:bg-indigo-600 hover:cursor-pointer text-white rounded-[24px] px-4 py-2 mt-4"
                         }
                         onClick={() => setCreatePostType("post")}
                       >
@@ -904,7 +941,7 @@ const Posts = (props) => {
                         className={
                           createPostType === "vote"
                             ? "bg-indigo-600 hover:bg-indigo-700 hover:cursor-pointer text-white rounded-[24px] px-4 py-2 mt-4"
-                            : "bg-indigo-500 hover:bg-indigo-600 hover:cursor-pointer text-white rounded-[24px] px-4 py-2 mt-4"
+                            : "bg-primary-indigo hover:bg-indigo-600 hover:cursor-pointer text-white rounded-[24px] px-4 py-2 mt-4"
                         }
                         onClick={() => setCreatePostType("vote")}
                       >
@@ -923,6 +960,7 @@ const Posts = (props) => {
                       handleSuccess={props.handleSuccess}
                       postButton={!props.discussion.deleted}
                       abortButton={false}
+                      folder={props.folder}
                     />
                   ) : null}
                   {createPostType === "vote" ? (
@@ -933,7 +971,7 @@ const Posts = (props) => {
                       >
                         <FontAwesomeIcon
                           icon={faPlus}
-                          className="text-gray-500 text-[1.2rem] group-hover:text-indigo-500 group-hover:cursor-pointer "
+                          className="text-gray-500 text-[1.2rem] group-hover:text-primary-indigo group-hover:cursor-pointer "
                         />
                         <div className="text-gray-500 text-[0.8rem]">
                           Legg til flere valgalternativer
@@ -942,7 +980,7 @@ const Posts = (props) => {
                       <input
                         type="text"
                         id={"voteTitle"}
-                        className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-indigo-500 mb-1 w-full"
+                        className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-primary-indigo mb-1 w-full"
                         placeholder={"Tittel på avstemming"}
                         required
                       ></input>
@@ -951,7 +989,7 @@ const Posts = (props) => {
                           type="text"
                           key={index}
                           id={"vote" + index}
-                          className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-indigo-500 mb-1 w-full"
+                          className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-primary-indigo mb-1 w-full"
                           placeholder={"Valgalternativ " + item}
                           required
                         ></input>
@@ -963,7 +1001,7 @@ const Posts = (props) => {
                         >
                           <FontAwesomeIcon
                             icon={faMinus}
-                            className="text-gray-500 text-[1.2rem] group-hover:text-indigo-500 group-hover:cursor-pointer "
+                            className="text-gray-500 text-[1.2rem] group-hover:text-primary-indigo group-hover:cursor-pointer "
                           />
                           <div className="text-gray-500 text-[0.8rem]">
                             Fjern valgalternativ
@@ -975,7 +1013,7 @@ const Posts = (props) => {
                           className={
                             createPostType === "vote"
                               ? "bg-indigo-600 hover:bg-indigo-700 hover:cursor-pointer text-white rounded-[24px] px-4 py-2 mt-4"
-                              : "bg-indigo-500 hover:bg-indigo-600 hover:cursor-pointer text-white rounded-[24px] px-4 py-2 mt-4"
+                              : "bg-primary-indigo hover:bg-indigo-600 hover:cursor-pointer text-white rounded-[24px] px-4 py-2 mt-4"
                           }
                           onClick={() => onClickCreateVote()}
                         >
@@ -993,7 +1031,7 @@ const Posts = (props) => {
       <div className="flex flex-col">
         <FontAwesomeIcon
           icon={faArrowDown}
-          className="text-gray-400 text-[1rem] hover:text-indigo-500 hover:cursor-pointer mt-1"
+          className="text-gray-400 text-[1rem] hover:text-primary-indigo hover:cursor-pointer mt-1"
           onClick={() => {
             window.scrollTo(0, document.body.scrollHeight);
           }}

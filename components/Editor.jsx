@@ -36,34 +36,49 @@ const EditorComponent = (props) => {
         created_by_avatar_url: props.currentUserProfile?.avatar_url,
       });
 
-      var total_posts = props.discussion.total_posts + 1;
-      var last_post_at = new Date();
-
       if (error) {
         props.handleError(error.message);
       }
       if (!error) {
-        props.handleSuccess("Posten er opprettet");
-      }
+        // Update discussion
+        const { data: dataDiscussion, error: errorDiscussion } = await supabase
+          .from("discussions")
+          .update({
+            total_posts: props.discussion.total_posts + 1,
+            last_post_by: props.currentUserProfile.user_name
+              ? props.currentUserProfile.user_name
+              : props.currentUserSession?.user?.user_metadata?.user_name,
+            last_post_at: new Date(),
+          })
+          .eq("id", props.discussion.id);
 
-      const { data: dataDiscussion, error: errorDiscussion } = await supabase
-        .from("discussions")
-        .update({
-          total_posts: total_posts,
-          last_post_by: props.currentUserProfile.user_name
-            ? props.currentUserProfile.user_name
-            : props.currentUserSession?.user?.user_metadata?.user_name,
-          last_post_at: last_post_at,
-        })
-        .eq("id", props.discussion.id);
+        if (errorDiscussion) {
+          props.handleError(errorDiscussion.message);
+        }
+        if (!errorDiscussion) {
+          // Update folder
+          const { data: dataFolder, error: errorFolder } = await supabase
+            .from("folders")
+            .update({
+              total_posts: props.folder.total_posts + 1,
+              last_post_by: props.currentUserProfile.user_name
+                ? props.currentUserProfile.user_name
+                : props.currentUserSession?.user?.user_metadata?.user_name,
+              last_post_at: new Date(),
+              latest_activity_discussion: props.discussion.title,
+              latest_activity_discussion_id: props.discussion.id,
+            })
+            .eq("id", props.discussion.parent_folder);
 
-      if (errorDiscussion) {
-        props.handleError(errorDiscussion.message);
+          if (errorFolder) {
+            props.handleError(errorFolder.message);
+          }
+          if (!errorFolder) {
+            props.handleSuccess("Posten er opprettet");
+            window.location.reload();
+          }
+        }
       }
-      if (!errorDiscussion) {
-        props.handleSuccess("Posten er opprettet.");
-      }
-      window.location.reload();
     }
   }
 
@@ -156,7 +171,7 @@ const EditorComponent = (props) => {
         ) : null}
         {props.postButton ? (
           <button
-            className="bg-indigo-500 text-white rounded-[24px] px-4 py-2 mt-4"
+            className="bg-primary-indigo text-white rounded-[24px] px-4 py-2 mt-4"
             onClick={
               props.action === "edit"
                 ? () => onClickEditPost()

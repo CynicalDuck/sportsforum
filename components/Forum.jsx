@@ -121,18 +121,20 @@ const Forum = (props) => {
 
   // Get the selected folder
   async function fetchSelectedFolder() {
-    const { data, error } = await supabase
-      .from("folders")
-      .select()
-      .eq("id", selectedFolderId);
+    if (selectedFolderId !== 0) {
+      const { data, error } = await supabase
+        .from("folders")
+        .select()
+        .eq("id", selectedFolderId);
 
-    if (data && !error && !selectedFolder) {
-      setSelectedFolder(data[0]);
-      fetchSelectedFolderDiscussions();
-    }
+      if (data && !error && !selectedFolder) {
+        setSelectedFolder(data[0]);
+        fetchSelectedFolderDiscussions();
+      }
 
-    if (error) {
-      props.handleError(error.message);
+      if (error) {
+        props.handleError(error.message);
+      }
     }
   }
 
@@ -301,31 +303,56 @@ const Forum = (props) => {
         props.handleError(error.message);
       }
       if (!error) {
-        props.handleSuccess(
-          "Tråden " + createNewDiscussionTitle + " er opprettet."
-        );
-      }
+        // Creating the first post in the discussion
+        if (data) {
+          if (editorRef.current.getContent().length > 1) {
+            const { data: dataPost, error: errorPost } = await supabase
+              .from("posts")
+              .insert({
+                content: editorRef.current.getContent(),
+                created_by: props.currentUserProfile.user_name
+                  ? props.currentUserProfile.user_name
+                  : props.currentUserSession?.user?.user_metadata?.user_name,
+                discussion: data[0].id,
+                created_by_id: props.currentUserSession?.user?.id,
+                created_by_avatar_url: props.currentUserProfile?.avatar_url,
+              });
 
-      if (data) {
-        if (editorRef.current.getContent().length > 1) {
-          await supabase.from("posts").insert({
-            content: editorRef.current.getContent(),
-            created_by: props.currentUserProfile.user_name
-              ? props.currentUserProfile.user_name
-              : props.currentUserSession?.user?.user_metadata?.user_name,
-            discussion: data[0].id,
-            created_by_id: props.currentUserSession?.user?.id,
-            created_by_avatar_url: props.currentUserProfile?.avatar_url,
-          });
-        }
+            if (errorPost) {
+              props.handleError(errorPost.message);
+            }
+            if (!errorPost) {
+              // Update folder with new post
 
-        if (discussions) {
-          setDiscussions(null);
+              const { data: dataFolder, error: errorFolder } = await supabase
+                .from("folders")
+                .update({
+                  last_post_at: new Date(),
+                  total_posts: 1,
+                  last_post_by: props.currentUserProfile.user_name
+                    ? props.currentUserProfile.user_name
+                    : props.currentUserSession?.user?.user_metadata?.user_name,
+                })
+                .eq("id", selectedFolderId);
+
+              if (errorFolder) {
+                props.handleError(errorFolder.message);
+              }
+              if (!errorFolder) {
+                props.handleSuccess(
+                  "Tråden " + createNewDiscussionTitle + " er opprettet."
+                );
+                if (discussions) {
+                  setDiscussions(null);
+                }
+                setCreateNewDiscussion(false);
+                setCreateNewDiscussionTitle("");
+                setCreateNewDiscussionDescription("");
+                window.location.reload();
+              }
+            }
+          }
         }
-        setCreateNewDiscussion(false);
-        setCreateNewDiscussionTitle("");
-        setCreateNewDiscussionDescription("");
-        window.location.reload();
       }
     }
   }
@@ -405,10 +432,10 @@ const Forum = (props) => {
           <div className="grid grid-cols-6 gap-4">
             <div className="col-span-1"></div>
             <div className="col-span-4 bg-white rounded-[24px] py-4 px-4">
-              <div className="text-gray-400 text-[0.7rem] mb-2">
+              <div className="text-secondary-text text-[0.7rem] mb-2">
                 Epost: {newUserEmail}
               </div>
-              <div className="text-gray-400 text-[0.7rem]">
+              <div className="text-secondary-text text-[0.7rem]">
                 Dersom din epost eksisterer i vårt system vil du få en e-post
                 med en lenke slik at du får logget på systemet og tilbakestilt
                 ditt passord. Om du ikke har fått denne eposten innen 5
@@ -425,7 +452,7 @@ const Forum = (props) => {
             <div className="col-span-1"></div>
             <div className="col-span-4 bg-white rounded-[24px] py-4 px-4">
               <input
-                className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-indigo-500 mt-2 w-full"
+                className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-primary-indigo mt-2 w-full"
                 type="email"
                 placeholder="E-post"
                 required
@@ -433,7 +460,7 @@ const Forum = (props) => {
                   setNewUserEmail(e.target.value);
                 }}
               />
-              <div className="text-gray-400 text-[0.7rem]">
+              <div className="text-secondary-text text-[0.7rem]">
                 Skriv inn din epost adresse og vi vil sende deg en e-post slik
                 au får logget inn og tilbakestilt ditt passord.
               </div>
@@ -448,7 +475,7 @@ const Forum = (props) => {
                 </button>
                 <button
                   type="submit"
-                  className="bg-indigo-500 text-white rounded-[24px] px-4 py-2"
+                  className="bg-primary-indigo text-white rounded-[24px] px-4 py-2"
                   onClick={() => onClickResetPassword()}
                 >
                   Send reset e-post
@@ -502,7 +529,7 @@ const Forum = (props) => {
             required
             onChange={(e) => setCreateNewFolderName(e.target.value)}
           ></input>
-          <label className="text-gray-400 text-[0.7rem]">
+          <label className="text-secondary-text text-[0.7rem]">
             Dette feltet er obligatorisk og må være på mer enn 3 tegn
           </label>
           <label className="text-gray-500 mt-2">Beskrivelse</label>
@@ -513,7 +540,7 @@ const Forum = (props) => {
             required
             onChange={(e) => setCreateNewFolderDescription(e.target.value)}
           ></input>
-          <label className="text-gray-400 text-[0.7rem]">
+          <label className="text-secondary-text text-[0.7rem]">
             Dette feltet er obligatorisk og må være på mer enn 3 tegn
           </label>
           {createNewFolderName.length > 2 &&
@@ -545,7 +572,7 @@ const Forum = (props) => {
           <input
             type="text"
             id="folder_title"
-            className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-indigo-500 mb-1 w-[100%]"
+            className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-primary-indigo mb-1 w-[100%]"
             placeholder="Mappetittel"
             defaultValue={selectedFolder.name}
           ></input>
@@ -553,7 +580,7 @@ const Forum = (props) => {
           <input
             type="text"
             id="folder_description"
-            className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-indigo-500 mb-1 w-[100%]"
+            className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-primary-indigo mb-1 w-[100%]"
             placeholder="Mappebeskrivelse"
             defaultValue={selectedFolder.description}
           ></input>
@@ -562,7 +589,7 @@ const Forum = (props) => {
             <input
               type="text"
               id="folder_delete"
-              className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-indigo-500 mb-1 w-[100%]"
+              className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-primary-indigo mb-1 w-[100%]"
               placeholder="For å slette mappen må du skrive inn mappenavnet"
               onChange={(e) => setFolderDeleteConfirmation(e.target.value)}
             ></input>
@@ -571,7 +598,7 @@ const Forum = (props) => {
                 folderDeleteConfirmation === selectedFolder.name ? false : true
               }
               type="button"
-              className="bg-red-500 text-white rounded-[24px] px-4 py-2 hover:bg-red-600 disabled:bg-gray-400"
+              className="bg-red-500 text-white rounded-[24px] px-4 py-2 hover:bg-red-600 disabled:bg-secondary-text"
               onClick={() => deleteFolder(selectedFolder)}
             >
               Slett
@@ -587,7 +614,7 @@ const Forum = (props) => {
             </button>
             <button
               type="button"
-              className="bg-indigo-500 text-white rounded-[24px] px-4 py-2 hover:bg-indigo-600"
+              className="bg-primary-indigo text-white rounded-[24px] px-4 py-2 hover:bg-indigo-600"
               onClick={() => saveFolderEdit(selectedFolder)}
             >
               Lagre
@@ -605,38 +632,38 @@ const Forum = (props) => {
         <div className="flex flex-row">
           {props.currentUserSession?.user?.aud === "authenticated" ? (
             <div className="flex flex-row gap-2">
-              <div className="group flex flex-row gap-1 hover:bg-indigo-500 rounded-[10px]">
+              <div className="group flex flex-row gap-1 hover:bg-primary-indigo rounded-[10px]">
                 <div
-                  className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-indigo-500"
+                  className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-primary-indigo"
                   onClick={() => setCreateNewDiscussion(true)}
                 >
                   <FontAwesomeIcon
                     icon={faMessage}
-                    className="text-gray-400 text-[0.7rem] group-hover:text-white group-hover:cursor-pointer"
+                    className="text-secondary-text text-[0.7rem] group-hover:text-white group-hover:cursor-pointer"
                   />
                 </div>
                 <div
                   onClick={() => setCreateNewDiscussion(true)}
-                  className="text-gray-400 text-[0.7rem] py-2 px-2 group-hover:text-white group-hover:cursor-pointer hidden lg:block"
+                  className="text-secondary-text text-[0.7rem] py-2 px-2 group-hover:text-white group-hover:cursor-pointer hidden lg:block"
                 >
                   Ny tråd
                 </div>
               </div>
               {selectedFolder.created_by_id ===
               props.currentUserProfile?.user_id ? (
-                <div className="group flex flex-row gap-1 hover:bg-indigo-500 rounded-[10px]">
+                <div className="group flex flex-row gap-1 hover:bg-primary-indigo rounded-[10px]">
                   <div
-                    className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-indigo-500"
+                    className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-primary-indigo"
                     onClick={() => setCreateNewDiscussion(true)}
                   >
                     <FontAwesomeIcon
                       icon={faPen}
-                      className="text-gray-400 text-[0.7rem] group-hover:text-white group-hover:cursor-pointer"
+                      className="text-secondary-text text-[0.7rem] group-hover:text-white group-hover:cursor-pointer"
                     />
                   </div>
                   <div
                     onClick={() => setEditFolder(true)}
-                    className="text-gray-400 text-[0.7rem] py-2 px-2 group-hover:text-white group-hover:cursor-pointer hidden lg:block"
+                    className="text-secondary-text text-[0.7rem] py-2 px-2 group-hover:text-white group-hover:cursor-pointer hidden lg:block"
                   >
                     Rediger denne mappen
                   </div>
@@ -648,31 +675,31 @@ const Forum = (props) => {
         <div className="flex flex-row flex-wrap">
           {selectedFolder.parent_array.map((parent, index) => (
             <div
-              className="text-gray-600 text-[0.7rem] hover:text-indigo-500 hover:cursor-pointer mt-4 mb-2 ml-2 bg-gray-100 rounded-[24px] px-3 py-1 hidden lg:block"
+              className="text-primary-text text-[0.7rem] hover:text-primary-indigo hover:cursor-pointer mt-4 mb-2 ml-2 bg-gray-100 rounded-[24px] px-3 py-1 hidden lg:block"
               onClick={() => (window.location.href = `?folder=${parent.id}`)}
               key={index}
             >
               {parent.name}
             </div>
           ))}
-          <div className="text-white text-[0.7rem] mt-4 mb-2 ml-2 bg-indigo-500 rounded-[24px] px-3 py-1 hidden lg:block">
+          <div className="text-white text-[0.7rem] mt-4 mb-2 ml-2 bg-primary-indigo rounded-[24px] px-3 py-1 hidden lg:block">
             {selectedFolder.name}
           </div>
         </div>
         {createNewDiscussion ? (
           <div className="flex flex-col gap-1 mt-2">
             <input
-              className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-indigo-500"
+              className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-primary-indigo"
               type="text"
               placeholder="Tittel"
               required
               onChange={(e) => setCreateNewDiscussionTitle(e.target.value)}
             ></input>
-            <label className="text-gray-400 text-[0.7rem]">
+            <label className="text-secondary-text text-[0.7rem]">
               Dette feltet er obligatorisk og må være på mer enn 3 tegn
             </label>
             <input
-              className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-indigo-500"
+              className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-primary-indigo"
               type="text"
               placeholder="Beskrivelse"
               required
@@ -680,7 +707,7 @@ const Forum = (props) => {
                 setCreateNewDiscussionDescription(e.target.value)
               }
             ></input>
-            <label className="text-gray-400 text-[0.7rem]">
+            <label className="text-secondary-text text-[0.7rem]">
               Dette feltet er ikke obligatorisk
             </label>
             <Editor
@@ -728,7 +755,7 @@ const Forum = (props) => {
               </button>
               {createNewDiscussionTitle.length > 2 ? (
                 <button
-                  className="bg-indigo-500 text-white rounded-[24px] px-4 py-2 mt-2"
+                  className="bg-primary-indigo text-white rounded-[24px] px-4 py-2 mt-2"
                   onClick={() => createDiscussion()}
                 >
                   Opprett
@@ -753,10 +780,10 @@ const Forum = (props) => {
                       <div className="flex flex-row gap-1">
                         <FontAwesomeIcon
                           icon={faMessage}
-                          className="text-gray-400 text-[0.7rem] group-hover:text-indigo-500 group-hover:cursor-pointer py-3 px-2"
+                          className="text-secondary-text text-[0.7rem] group-hover:text-primary-indigo group-hover:cursor-pointer py-3 px-2"
                         />
-                        <div className="text-gray-400 text-[0.7rem] py-2 px-2 group-hover:text-gray-600 group-hover:cursor-pointer">
-                          <div className="text-gray-600 text-[0.9rem]">
+                        <div className="text-secondary-text text-[0.7rem] py-2 px-2 group-hover:text-primary-text group-hover:cursor-pointer">
+                          <div className="text-primary-text text-[0.9rem]">
                             {discussion.title}
                           </div>
                         </div>
@@ -764,10 +791,10 @@ const Forum = (props) => {
                       <div className="flex flex-row gap-1">
                         <FontAwesomeIcon
                           icon={faInfo}
-                          className="text-gray-400 group-hover:cursor-pointer py-3 px-3"
+                          className="text-secondary-text group-hover:cursor-pointer py-3 px-3"
                         />
-                        <div className="text-gray-400 py-2 px-2 group-hover:text-gray-600 group-hover:cursor-pointer">
-                          <div className="text-gray-600 text-[0.8rem]">
+                        <div className="text-secondary-text py-2 px-2 group-hover:text-primary-text group-hover:cursor-pointer">
+                          <div className="text-primary-text text-[0.8rem]">
                             {discussion.description
                               ? discussion.description
                               : "Ingen beskrivelse"}
@@ -779,10 +806,10 @@ const Forum = (props) => {
                       <div className="flex flex-row">
                         <FontAwesomeIcon
                           icon={faClock}
-                          className="text-gray-400 text-[0.7rem] group-hover:cursor-pointer py-3 px-3"
+                          className="text-secondary-text text-[0.7rem] group-hover:cursor-pointer py-3 px-3"
                         />
-                        <div className="text-gray-400 text-[0.7rem] py-2 group-hover:text-gray-600 group-hover:cursor-pointer">
-                          <div className="text-gray-400 text-[0.7rem]">
+                        <div className="text-secondary-text text-[0.7rem] py-2 group-hover:text-primary-text group-hover:cursor-pointer">
+                          <div className="text-secondary-text text-[0.7rem]">
                             <Moment fromNow>{discussion.last_post_at}</Moment>
                           </div>
                         </div>
@@ -790,10 +817,10 @@ const Forum = (props) => {
                       <div className="flex flex-row">
                         <FontAwesomeIcon
                           icon={faUser}
-                          className="text-gray-400 text-[0.7rem] group-hover:cursor-pointer py-3 px-3"
+                          className="text-secondary-text text-[0.7rem] group-hover:cursor-pointer py-3 px-3"
                         />
-                        <div className="text-gray-400 text-[0.7rem] py-2 hover:text-gray-600 group-hover:cursor-pointer">
-                          <div className="text-gray-400 text-[0.7rem]">
+                        <div className="text-secondary-text text-[0.7rem] py-2 hover:text-primary-text group-hover:cursor-pointer">
+                          <div className="text-secondary-text text-[0.7rem]">
                             {discussion.last_post_by}
                           </div>
                         </div>
@@ -801,13 +828,13 @@ const Forum = (props) => {
                       <div className="flex flex-row ">
                         <FontAwesomeIcon
                           icon={faTicket}
-                          className="text-gray-400 text-[0.7rem] group-hover:cursor-pointer py-3 px-3 hover:text-indigo-500"
+                          className="text-secondary-text text-[0.7rem] group-hover:cursor-pointer py-3 px-3 hover:text-primary-indigo"
                           onClick={() => {
                             window.location.href = `?folder=${selectedFolder.id}&discussion=${discussion.id}&page=1&post=${discussion.total_posts}`;
                           }}
                         />
-                        <div className="text-gray-400 text-[0.7rem] py-2 group-hover:text-gray-600 group-hover:cursor-pointer">
-                          <div className="text-gray-400 text-[0.7rem] ">
+                        <div className="text-secondary-text text-[0.7rem] py-2 group-hover:text-primary-text group-hover:cursor-pointer">
+                          <div className="text-secondary-text text-[0.7rem] ">
                             {discussion.total_posts}
                           </div>
                         </div>
@@ -829,7 +856,7 @@ const Forum = (props) => {
         <div className="flex flex-row flex-wrap">
           {selectedFolder.parent_array.map((parent, index) => (
             <div
-              className="text-gray-600 text-[0.7rem] hover:text-indigo-500 hover:cursor-pointer mt-4 mb-2 ml-2 bg-gray-100 rounded-[24px] px-3 py-1 hidden lg:block"
+              className="text-primary-text text-[0.7rem] hover:text-primary-indigo hover:cursor-pointer mt-4 mb-2 ml-2 bg-gray-100 rounded-[24px] px-3 py-1 hidden lg:block"
               onClick={() => (window.location.href = `?folder=${parent.id}`)}
               key={index}
             >
@@ -837,14 +864,14 @@ const Forum = (props) => {
             </div>
           ))}
           <div
-            className="text-gray-600 text-[0.7rem] hover:text-indigo-500 hover:cursor-pointer mt-4 mb-2 ml-2 bg-gray-100 rounded-[24px] px-3 py-1 hidden lg:block"
+            className="text-primary-text text-[0.7rem] hover:text-primary-indigo hover:cursor-pointer mt-4 mb-2 ml-2 bg-gray-100 rounded-[24px] px-3 py-1 hidden lg:block"
             onClick={() =>
               (window.location.href = `?folder=${selectedFolder.id}`)
             }
           >
             {selectedFolder.name}
           </div>
-          <div className="text-white text-[0.7rem] mt-4 mb-2 ml-2 bg-indigo-500 rounded-[24px] px-3 py-1 hidden lg:block">
+          <div className="text-white text-[0.7rem] mt-4 mb-2 ml-2 bg-primary-indigo rounded-[24px] px-3 py-1 hidden lg:block">
             {selectedDiscussion.title}
           </div>
         </div>
@@ -857,6 +884,7 @@ const Forum = (props) => {
           currentUserProfile={props.currentUserProfile}
           handleError={props.handleError}
           handleSuccess={props.handleSuccess}
+          folder={selectedFolder}
         />
       </section>
     );
@@ -870,19 +898,19 @@ const Forum = (props) => {
           props.currentUserProfile?.is_mod ||
           props.currentUserProfile?.is_admin ? (
             <div className="flex flex-row gap-2">
-              <div className="group flex flex-row gap-1 hover:bg-indigo-500 rounded-[10px]">
+              <div className="group flex flex-row gap-1 hover:bg-primary-indigo rounded-[10px]">
                 <div
-                  className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-indigo-500"
+                  className="bg-gray-100 rounded-[10px] py-2 px-2 group-hover:bg-primary-indigo"
                   onClick={() => setCreateNewFolder(true)}
                 >
                   <FontAwesomeIcon
                     icon={faFolder}
-                    className="text-gray-400 text-[0.7rem] group-hover:text-white group-hover:cursor-pointer"
+                    className="text-secondary-text text-[0.7rem] group-hover:text-white group-hover:cursor-pointer"
                   />
                 </div>
                 <div
                   onClick={() => setCreateNewFolder(true)}
-                  className="text-gray-400 text-[0.7rem] py-2 px-2 group-hover:text-white group-hover:cursor-pointer hidden lg:block"
+                  className="text-secondary-text text-[0.7rem] py-2 px-2 group-hover:text-white group-hover:cursor-pointer hidden lg:block"
                 >
                   Ny mappe
                 </div>
@@ -895,24 +923,24 @@ const Forum = (props) => {
         <div className="flex flex-col gap-1 mt-2">
           <label className="text-gray-500">Mappenavn</label>
           <input
-            className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-indigo-500"
+            className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-primary-indigo"
             type="text"
             placeholder="Mappenavn"
             required
             onChange={(e) => setCreateNewFolderName(e.target.value)}
           ></input>
-          <label className="text-gray-400 text-[0.7rem]">
+          <label className="text-secondary-text text-[0.7rem]">
             Dette feltet er obligatorisk og må være på mer enn 3 tegn
           </label>
           <label className="text-gray-500 mt-2">Beskrivelse</label>
           <input
-            className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-indigo-500"
+            className="border border-gray-300 rounded-[24px] px-4 py-2 focus:outline-primary-indigo"
             type="text"
             placeholder="Beskrivelse"
             required
             onChange={(e) => setCreateNewFolderDescription(e.target.value)}
           ></input>
-          <label className="text-gray-400 text-[0.7rem]">
+          <label className="text-secondary-text text-[0.7rem]">
             Dette feltet er obligatorisk og må være på mer enn 3 tegn
           </label>
           <div className="flex flex-row gap-2">
@@ -925,7 +953,7 @@ const Forum = (props) => {
             {createNewFolderName.length > 2 &&
             createNewFolderDescription.length > 2 ? (
               <button
-                className="bg-indigo-500 text-white rounded-[24px] px-4 py-2 mt-2"
+                className="bg-primary-indigo text-white rounded-[24px] px-4 py-2 mt-2"
                 onClick={() => createFolder(0)}
               >
                 Opprett

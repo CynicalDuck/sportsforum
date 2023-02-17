@@ -165,7 +165,7 @@ const Page = () => {
 
   if (currentUserProfile && currentUserSession && currentUserSessionState) {
     return (
-      <div className="bg-gray-200 min-h-screen h-[100%]">
+      <div className="bg-gray-200 min-h-screen h-[100%] flex flex-col flex-wrap">
         <Navbar boardSettings={boardSettings} />
         {announcements
           ? announcements.map((announcement, index) =>
